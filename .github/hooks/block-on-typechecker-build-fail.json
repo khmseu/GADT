@@ -1,0 +1,11 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "type": "command",
+        "command": "node .github/hooks/scripts/block-on-typechecker-build-fail.mjs",
+        "timeout": 180
+      }
+    ]
+  }
+}

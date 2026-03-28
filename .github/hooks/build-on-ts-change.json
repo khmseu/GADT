@@ -1,0 +1,11 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "type": "command",
+        "command": "node .github/hooks/scripts/build-on-ts-change.mjs",
+        "timeout": 180
+      }
+    ]
+  }
+}

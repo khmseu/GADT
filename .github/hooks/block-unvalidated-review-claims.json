@@ -1,0 +1,11 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "type": "command",
+        "command": "node .github/hooks/scripts/block-unvalidated-review-claims.mjs",
+        "timeout": 60
+      }
+    ]
+  }
+}
