@@ -1,5 +1,5 @@
 ---
-description: "Use when working on the GADT compiler pipeline, including AST/type updates, refinement logic, unification, elaboration, evaluation, and demo wiring. Trigger phrases: add GADT constructor, typechecker refinement, unification fix, elaboration update, pipeline refactor."
+description: "Use when implementing GADT compiler pipeline changes, including AST/type updates, refinement logic, unification, elaboration, evaluation, and demo wiring. Trigger phrases: add GADT constructor, implement match branch, typechecker refinement, unification fix, elaboration update, pipeline refactor."
 name: "GADT Pipeline Specialist"
 tools: [read, search, edit, execute, todo, agent]
 argument-hint: "Describe the pipeline change to implement (module, behavior, and expected output)."

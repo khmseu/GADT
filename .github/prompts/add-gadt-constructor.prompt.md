@@ -2,7 +2,7 @@
 description: "Add a new GADT constructor end-to-end across typing, elaboration, evaluation, and demo wiring."
 name: "Add GADT Constructor"
 argument-hint: "Constructor spec (GADT name, constructor name, fields, constraints, return indices, and example usage)"
-agent: "agent"
+agent: "GADT Pipeline Specialist"
 ---
 Implement a new GADT constructor in this repository using the user-provided constructor specification.
 

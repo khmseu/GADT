@@ -2,7 +2,7 @@
 description: "Add or update a GADT pattern-match branch with sound type refinement, elaboration alignment, and demo validation."
 name: "Add GADT Match Branch"
 argument-hint: "Match-branch spec (target expression/function, pattern constructor, branch variables, branch body intent, and expected result type)"
-agent: "agent"
+agent: "GADT Pipeline Specialist"
 ---
 Implement a new or revised GADT match branch in this repository using the provided argument as the specification.
 

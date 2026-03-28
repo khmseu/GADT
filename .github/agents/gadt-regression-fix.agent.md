@@ -1,5 +1,5 @@
 ---
-description: "Use when implementing approved fixes for findings from GADT regression audits across typechecker, elaboration, and eval. Trigger phrases: apply regression fixes, implement audit findings, fix cross-stage regression, remediation pass after regression review."
+description: "Use when implementing approved fixes for findings from GADT regression audits across typechecker, elaboration, and eval. Trigger phrases: apply regression fixes, implement audit findings, fix cross-stage regression, remediation pass after regression review, implement regression remediation."
 name: "GADT Regression Fixer"
 tools: [read, search, edit, execute, todo, agent]
 argument-hint: "Provide approved findings, affected files, expected behavior, and any constraints for the remediation pass."
