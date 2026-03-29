@@ -13,13 +13,16 @@ import {
   TypeTag,
   kStar,
   resetIdCounter,
+  tApp,
   tArrow,
   tCon,
   tForall,
   tMeta,
+  tRefined,
   tVar,
 } from "./types";
 import {
+  applyRefinements,
   OccursCheckError,
   prettyType,
   tryUnify,
@@ -95,4 +98,41 @@ test("unify treats alpha-equivalent forall types as equal", () => {
 
   equal(first.body.tag, TypeTag.Arrow);
   equal(second.body.tag, TypeTag.Arrow);
+});
+
+test("applyRefinements propagates equalities into metavariables", () => {
+  resetIdCounter();
+
+  const meta = tMeta();
+  const eqs = [{ lhs: meta, rhs: tCon("Int") }];
+
+  applyRefinements(eqs);
+  equal(prettyType(zonk(meta)), "Int");
+});
+
+test("zonk compresses meta indirections to terminal type", () => {
+  resetIdCounter();
+
+  const m1 = tMeta();
+  const m2 = tMeta();
+
+  unify(m1, m2);
+  unify(m2, tCon("Bool"));
+
+  const resolved = zonk(m1);
+  equal(prettyType(resolved), "Bool");
+  equal(m1.ref.contents?.tag, TypeTag.Constructor);
+});
+
+test("prettyType renders refined and application forms", () => {
+  resetIdCounter();
+
+  const lhs = tCon("Expr", [tCon("Int")]);
+  const rhs = tCon("Expr", [tCon("Bool")]);
+
+  const app = tApp(tCon("F"), tCon("Int"));
+  const refined = tRefined(lhs, [{ lhs, rhs }]);
+
+  equal(prettyType(app), "(F Int)");
+  equal(prettyType(refined), "Expr<Int> | Expr<Int> ~ Expr<Bool>");
 });
