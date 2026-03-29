@@ -49,6 +49,9 @@ The demo entrypoint is `src/main.ts` (compiled output: `dist/main.js`).
 
 ## Project Structure
 
+Architecture deep dive: [docs/architecture.md](docs/architecture.md)
+Terminology quick reference: [docs/glossary.md](docs/glossary.md)
+
 - `src/ast.ts`: Surface AST
 - `src/types.ts`: Types and kinds
 - `src/gadt.ts`: GADT declarations and substitutions
