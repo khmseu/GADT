@@ -5,6 +5,8 @@ argument-hint: "Constructor spec (GADT name, constructor name, fields, constrain
 agent: "GADT Pipeline Specialist"
 ---
 
+# Add GADT Constructor
+
 Implement a new GADT constructor in this repository using the user-provided constructor specification.
 
 Use the argument text as the source of truth for:

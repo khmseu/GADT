@@ -5,6 +5,8 @@ argument-hint: "Match-branch spec (target expression/function, pattern construct
 agent: "GADT Pipeline Specialist"
 ---
 
+# Add GADT Match Branch
+
 Implement a new or revised GADT match branch in this repository using the provided argument as the specification.
 
 Use the argument text as the source of truth for:

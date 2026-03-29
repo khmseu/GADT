@@ -5,6 +5,8 @@ argument-hint: "Describe changed files/diff, failing scenarios, and diagnostics 
 agent: "GADT Diagnostics Reviewer"
 ---
 
+# Review Diagnostics Quality
+
 Review diagnostics quality for the provided changes in this repository.
 
 This prompt is for analysis/audit output only. Do not implement code changes unless explicitly requested.

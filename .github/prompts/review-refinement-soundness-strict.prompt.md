@@ -5,6 +5,8 @@ argument-hint: "Describe changed files/diff, expected behavior, and any suspicio
 agent: "GADT Refinement Reviewer"
 ---
 
+# Review Refinement Soundness (Strict)
+
 Review the provided change set for refinement soundness in this repository.
 
 This prompt is for analysis/audit output only. Do not implement code changes unless explicitly requested.

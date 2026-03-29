@@ -5,6 +5,8 @@ argument-hint: "Describe changed files/diff, expected behavior, observed drift, 
 agent: "GADT Regression Auditor"
 ---
 
+# Review Regression Surface Strict
+
 Review the provided change set for broader behavior/regression risk across the GADT pipeline.
 
 This prompt is for analysis/audit output only. Do not implement code changes unless explicitly requested.
