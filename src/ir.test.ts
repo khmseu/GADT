@@ -15,6 +15,7 @@ import {
   coRefl,
   coSym,
   coTrans,
+  Coercion,
   CoreExpr,
 } from "./ir";
 import { prettyCoreExpr, prettyCoercion } from "./prettyprint";
@@ -185,4 +186,111 @@ test("prettyCoreExpr renders CoreCast with coercion evidence", () => {
   const rendered = prettyCoreExpr(expr);
   match(rendered, /▷/);
   match(rendered, /axiom\(cast_ax/);
+});
+
+// ============================================================
+// Remaining coercion forms — CoArrow / CoApp / CoForall / CoVar
+// ============================================================
+
+test("prettyCoercion renders CoArrow correctly", () => {
+  const co: Coercion = {
+    tag: "CoArrow",
+    param: coRefl(tCon("Int")),
+    result: coRefl(tCon("Bool")),
+  };
+  equal(prettyCoercion(co), "arrow(refl(Int), refl(Bool))");
+});
+
+test("prettyCoercion renders CoApp correctly", () => {
+  const co: Coercion = {
+    tag: "CoApp",
+    constructor: coRefl(tCon("Maybe")),
+    argument: coRefl(tCon("Int")),
+  };
+  equal(prettyCoercion(co), "app(refl(Maybe), refl(Int))");
+});
+
+test("prettyCoercion renders CoForall correctly", () => {
+  const a = tVar("a");
+  const co: Coercion = {
+    tag: "CoForall",
+    variable: a,
+    kind: kStar,
+    body: coRefl(tCon("Int")),
+  };
+  equal(prettyCoercion(co), "forall(a, refl(Int))");
+});
+
+test("prettyCoercion renders CoVar correctly", () => {
+  const co: Coercion = {
+    tag: "CoVar",
+    name: "c0",
+    lhs: tCon("Int"),
+    rhs: tCon("Bool"),
+  };
+  equal(prettyCoercion(co), "co_c0");
+});
+
+// ============================================================
+// prettyCoreExpr — remaining expression forms
+// ============================================================
+
+test("prettyCoreExpr renders CoreTyLam with Λ notation", () => {
+  const body: CoreExpr = { tag: "CoreLit", value: 1, type: tCon("Int") };
+  const a = tVar("a");
+  const expr: CoreExpr = {
+    tag: "CoreTyLam",
+    typeVar: a,
+    kind: kStar,
+    body,
+    type: { tag: "Forall" as any, variable: a, kind: kStar, body: tCon("Int") },
+  };
+  match(prettyCoreExpr(expr), /Λa/);
+});
+
+test("prettyCoreExpr renders CoreTyApp with @[] notation", () => {
+  const inner: CoreExpr = { tag: "CoreVar", name: "f", type: tCon("Int") };
+  const expr: CoreExpr = {
+    tag: "CoreTyApp",
+    expr: inner,
+    typeArg: tCon("Bool"),
+    type: tCon("Int"),
+  };
+  match(prettyCoreExpr(expr), /@\[Bool\]/);
+});
+
+test("prettyCoreExpr renders CoreLet with binding and body", () => {
+  const value: CoreExpr = { tag: "CoreLit", value: 5, type: tCon("Int") };
+  const body: CoreExpr = { tag: "CoreVar", name: "y", type: tCon("Int") };
+  const expr: CoreExpr = {
+    tag: "CoreLet",
+    name: "y",
+    type: tCon("Int"),
+    value,
+    body,
+  };
+  const rendered = prettyCoreExpr(expr);
+  match(rendered, /let y/);
+  match(rendered, /in/);
+});
+
+test("prettyCoreExpr renders CoreCase with alternatives and result type", () => {
+  const scrutinee: CoreExpr = { tag: "CoreLit", value: true, type: tCon("Bool") };
+  const trueBranch: CoreExpr = { tag: "CoreLit", value: 1, type: tCon("Int") };
+  const falseBranch: CoreExpr = { tag: "CoreLit", value: 0, type: tCon("Int") };
+  const expr: CoreExpr = {
+    tag: "CoreCase",
+    scrutinee,
+    scrutineeType: tCon("Bool"),
+    alternatives: [
+      { constructor: "True", existentials: [], coercions: [], bindings: [], body: trueBranch },
+      { constructor: "False", existentials: [], coercions: [], bindings: [], body: falseBranch },
+    ],
+    resultType: tCon("Int"),
+  };
+  const rendered = prettyCoreExpr(expr);
+  match(rendered, /case/);
+  match(rendered, /True/);
+  match(rendered, /False/);
+  match(rendered, /Int/);
 });
