@@ -15,8 +15,10 @@ import {
   GADTConstructor,
   GADTTypeParam,
   gadtDeclaration,
+  instantiateConstructor,
 } from "./gadt";
 import {
+  kArrow,
   kStar,
   tArrow,
   tCon,
@@ -114,4 +116,53 @@ test("applySubstitution follows solved metavariables", () => {
   const substituted = applySubstitution(meta, new Map());
 
   equal(prettyType(substituted), "Int");
+});
+
+test("gadtDeclaration synthesizes result kind from type parameters", () => {
+  const a = tVar("a");
+  const b = tVar("b");
+  const decl = gadtDeclaration(
+    "Pair",
+    [
+      { variable: a, kind: kStar },
+      { variable: b, kind: kStar },
+    ],
+    [
+      {
+        name: "MkPair",
+        existentials: [],
+        constraints: [],
+        fields: [a, b],
+        returnType: tCon("Pair", [a, b]),
+        returnIndices: [a, b],
+      },
+    ]
+  );
+
+  deepStrictEqual(decl.kind, kArrow(kStar, kArrow(kStar, kStar)));
+});
+
+test("instantiateConstructor substitutes fields, return type, and constraints", () => {
+  const a = tVar("a");
+  const b = tVar("b");
+  const ctor: GADTConstructor = {
+    name: "Wrap",
+    universals: [{ variable: a, kind: kStar }],
+    existentials: [{ variable: b, kind: kStar }],
+    constraints: [{ lhs: a, rhs: b }],
+    fields: [tCon("Pair", [a, b])],
+    returnType: tCon("Box", [a]),
+    returnIndices: [a],
+  };
+
+  const instantiated = instantiateConstructor(ctor, new Map([
+    [a.id, tCon("Int")],
+    [b.id, tCon("Bool")],
+  ]));
+
+  equal(prettyType(instantiated.fields[0]), "Pair<Int, Bool>");
+  equal(prettyType(instantiated.returnType), "Box<Int>");
+  equal(instantiated.residualConstraints.length, 1);
+  equal(prettyType(instantiated.residualConstraints[0].lhs), "Int");
+  equal(prettyType(instantiated.residualConstraints[0].rhs), "Bool");
 });
