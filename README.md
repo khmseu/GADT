@@ -20,6 +20,16 @@ npm install
 npm run build
 ```
 
+## Test
+
+```bash
+npm test
+```
+
+This repository does not yet have a dedicated unit-test suite. For now, the
+test entrypoint runs the documented verification path: compile the compiler and
+execute the demo program.
+
 ## Run Demo
 
 ```bash
@@ -45,7 +55,8 @@ The demo entrypoint is `src/main.ts` (compiled output: `dist/main.js`).
 
 - The codebase uses tagged unions (`tag` fields) and exhaustive switch handling.
 - Keep diagnostics explicit (include constructor/type names in type errors).
-- There is currently no dedicated automated test suite; use build + demo (`npm run build` and `npm run start`) as the primary verification path.
+- There is currently no dedicated automated test suite; `npm test` runs the primary verification path (`npm run build && npm run start`).
+- GitHub Actions runs `npm test` on every push.
 
 ## Copilot Customization
 
