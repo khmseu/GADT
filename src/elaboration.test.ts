@@ -166,12 +166,12 @@ test("elaborate lambda produces CoreLam with arrow type", () => {
 test("elaborate application unifies function and argument types", () => {
   const env = makeEnv();
   // Build (λx:Int. x) 7
-  const func: typeof import("./ast").Expr = {
+  const func = {
     tag: "ELambda",
     param: "x",
     paramType: tCon("Int"),
     body: { tag: "EVar", name: "x" },
-  };
+  } as const;
   const result = elaborate(env, {
     tag: "EApp",
     func,
