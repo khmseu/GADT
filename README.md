@@ -26,9 +26,18 @@ npm run build
 npm test
 ```
 
-This repository does not yet have a dedicated unit-test suite. For now, the
-test entrypoint runs the documented verification path: compile the compiler and
-execute the demo program.
+This repository ships with a real assertion-based test suite built on Node's
+built-in test runner. The test command compiles the project and runs the
+compiled `*.test.js` files from `dist/`.
+
+## Demo Smoke Test
+
+```bash
+npm run test:demo
+```
+
+The demo smoke path is kept separate from `npm test`. It compiles the compiler
+and executes the end-to-end sample program in `src/main.ts`.
 
 ## Run Demo
 
@@ -55,8 +64,9 @@ The demo entrypoint is `src/main.ts` (compiled output: `dist/main.js`).
 
 - The codebase uses tagged unions (`tag` fields) and exhaustive switch handling.
 - Keep diagnostics explicit (include constructor/type names in type errors).
-- There is currently no dedicated automated test suite; `npm test` runs the primary verification path (`npm run build && npm run start`).
-- GitHub Actions runs `npm test` on every push.
+- `npm test` runs the real assertion-based test suite after compiling to `dist/`.
+- `npm run test:demo` preserves the demo-based smoke verification path.
+- GitHub Actions runs both the real test suite and the demo smoke path on every push.
 
 ## Copilot Customization
 
