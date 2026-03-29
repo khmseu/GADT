@@ -82,7 +82,9 @@ function run(command) {
 async function main() {
   const raw = await readStdin();
   if (!raw.trim()) {
-    process.stdout.write(continueResponse("No hook payload; skipping pipeline verification."));
+    process.stdout.write(
+      continueResponse("No hook payload; skipping pipeline verification."),
+    );
     return;
   }
 
@@ -90,18 +92,30 @@ async function main() {
   try {
     payload = JSON.parse(raw);
   } catch {
-    process.stdout.write(continueResponse("Invalid hook payload JSON; skipping pipeline verification."));
+    process.stdout.write(
+      continueResponse(
+        "Invalid hook payload JSON; skipping pipeline verification.",
+      ),
+    );
     return;
   }
 
   const toolName = getToolName(payload);
   if (!EDIT_TOOLS.has(toolName)) {
-    process.stdout.write(continueResponse("Tool is not an edit action; skipping pipeline verification."));
+    process.stdout.write(
+      continueResponse(
+        "Tool is not an edit action; skipping pipeline verification.",
+      ),
+    );
     return;
   }
 
   if (!hasPipelineTarget(payload)) {
-    process.stdout.write(continueResponse("No GADT pipeline target file changed; skipping pipeline verification."));
+    process.stdout.write(
+      continueResponse(
+        "No GADT pipeline target file changed; skipping pipeline verification.",
+      ),
+    );
     return;
   }
 
@@ -116,7 +130,9 @@ async function main() {
       process.stderr.write(`${startOut.trim()}\n`);
     }
 
-    process.stdout.write(continueResponse("GADT pipeline verification succeeded (build + start)."));
+    process.stdout.write(
+      continueResponse("GADT pipeline verification succeeded (build + start)."),
+    );
   } catch (error) {
     const stdout = error?.stdout?.toString?.() ?? "";
     const stderr = error?.stderr?.toString?.() ?? "";
@@ -125,7 +141,9 @@ async function main() {
       process.stderr.write(`${details}\n`);
     }
 
-    process.stdout.write(blockResponse("GADT pipeline verification failed (build/start)."));
+    process.stdout.write(
+      blockResponse("GADT pipeline verification failed (build/start)."),
+    );
     process.exitCode = 2;
   }
 }

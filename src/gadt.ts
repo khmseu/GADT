@@ -7,8 +7,16 @@
 // Deps   : types
 
 import {
-  Type, Kind, TypeEquality, TypeVarId, TVar,
-  TypeTag, KindTag, tVar, tCon, kStar,
+  Type,
+  Kind,
+  TypeEquality,
+  TypeVarId,
+  TVar,
+  TypeTag,
+  KindTag,
+  tVar,
+  tCon,
+  kStar,
 } from "./types";
 
 /**
@@ -22,10 +30,10 @@ import {
  *     Eq      : Expr Int -> Expr Int -> Expr Bool
  */
 export interface GADTDeclaration {
-  name: string;                          // e.g. "Expr"
-  typeParams: GADTTypeParam[];           // universally quantified params
-  kind: Kind;                            // resulting kind
-  constructors: GADTConstructor[];       // data constructors
+  name: string; // e.g. "Expr"
+  typeParams: GADTTypeParam[]; // universally quantified params
+  kind: Kind; // resulting kind
+  constructors: GADTConstructor[]; // data constructors
 }
 
 export interface GADTTypeParam {
@@ -43,12 +51,12 @@ export interface GADTTypeParam {
  */
 export interface GADTConstructor {
   name: string;
-  universals: GADTTypeParam[];           // from the parent GADT
-  existentials: GADTTypeParam[];         // ∃-bound type vars introduced by this ctor
-  constraints: TypeEquality[];           // equalities that hold when this ctor is matched
-  fields: Type[];                        // argument types
-  returnType: Type;                      // must be an application of the parent GADT
-  returnIndices: Type[];                 // the type indices in the return type
+  universals: GADTTypeParam[]; // from the parent GADT
+  existentials: GADTTypeParam[]; // ∃-bound type vars introduced by this ctor
+  constraints: TypeEquality[]; // equalities that hold when this ctor is matched
+  fields: Type[]; // argument types
+  returnType: Type; // must be an application of the parent GADT
+  returnIndices: Type[]; // the type indices in the return type
 }
 
 /**
@@ -57,11 +65,11 @@ export interface GADTConstructor {
 export function gadtDeclaration(
   name: string,
   typeParams: GADTTypeParam[],
-  constructors: Omit<GADTConstructor, "universals">[]
+  constructors: Omit<GADTConstructor, "universals">[],
 ): GADTDeclaration {
   const kind = typeParams.reduceRight<Kind>(
     (acc, p) => ({ tag: KindTag.Arrow, from: p.kind, to: acc }),
-    kStar
+    kStar,
   );
   return {
     name,
@@ -87,7 +95,7 @@ export function gadtDeclaration(
  */
 export function extractRefinements(
   scrutineeIndices: Type[],
-  ctor: GADTConstructor
+  ctor: GADTConstructor,
 ): TypeEquality[] {
   const equalities: TypeEquality[] = [...ctor.constraints];
 
@@ -109,7 +117,7 @@ export function extractRefinements(
  */
 export function instantiateConstructor(
   ctor: GADTConstructor,
-  typeArgs: Map<TypeVarId, Type>
+  typeArgs: Map<TypeVarId, Type>,
 ): { fields: Type[]; returnType: Type; residualConstraints: TypeEquality[] } {
   const subst = new Map(typeArgs);
 

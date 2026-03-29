@@ -29,12 +29,18 @@ export function evaluate(env: ValueEnv, expr: CoreExpr): Value {
     }
 
     case "CoreLam":
-      return { tag: "VClosure", param: expr.param, body: expr.body, env: new Map(env) };
+      return {
+        tag: "VClosure",
+        param: expr.param,
+        body: expr.body,
+        env: new Map(env),
+      };
 
     case "CoreApp": {
       const func = evaluate(env, expr.func);
       const arg = evaluate(env, expr.arg);
-      if (func.tag !== "VClosure") throw new Error("Application of non-function");
+      if (func.tag !== "VClosure")
+        throw new Error("Application of non-function");
       const newEnv = new Map(func.env);
       newEnv.set(func.param, arg);
       return evaluate(newEnv, func.body);
@@ -79,7 +85,11 @@ function evaluateCase(env: ValueEnv, scrutinee: Value, alts: CoreAlt[]): Value {
     for (const alt of alts) {
       if (alt.constructor === scrutinee.constructor) {
         const newEnv = new Map(env);
-        for (let i = 0; i < alt.bindings.length && i < scrutinee.args.length; i++) {
+        for (
+          let i = 0;
+          i < alt.bindings.length && i < scrutinee.args.length;
+          i++
+        ) {
           newEnv.set(alt.bindings[i].name, scrutinee.args[i]);
         }
         return evaluate(newEnv, alt.body);
@@ -95,7 +105,9 @@ function evaluateCase(env: ValueEnv, scrutinee: Value, alts: CoreAlt[]): Value {
         return evaluate(newEnv, alt.body);
       }
     }
-    throw new Error(`No matching alternative for constructor: ${scrutinee.tag === "VConstruct" ? scrutinee.constructor : "?"}`);
+    throw new Error(
+      `No matching alternative for constructor: ${scrutinee.tag === "VConstruct" ? scrutinee.constructor : "?"}`,
+    );
   }
 
   // Bool literals for if-then-else elaboration

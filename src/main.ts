@@ -7,16 +7,33 @@
 // Deps   : types, gadt, ast, typechecker, elaboration, eval, prettyprint, unification
 
 import {
-  Type, TypeTag, TypeVarId, TVar,
-  tVar, tCon, tArrow, tMeta, kStar, kArrow,
-  resetIdCounter, freshId,
+  Type,
+  TypeTag,
+  TypeVarId,
+  TVar,
+  tVar,
+  tCon,
+  tArrow,
+  tMeta,
+  kStar,
+  kArrow,
+  resetIdCounter,
+  freshId,
 } from "./types";
 import {
-  GADTDeclaration, GADTConstructor, GADTTypeParam,
+  GADTDeclaration,
+  GADTConstructor,
+  GADTTypeParam,
   gadtDeclaration,
 } from "./gadt";
 import { Expr, Pattern, MatchBranch, EMatch, EConstruct } from "./ast";
-import { TypeEnv, emptyEnv, registerGADT, infer, checkExhaustiveness } from "./typechecker";
+import {
+  TypeEnv,
+  emptyEnv,
+  registerGADT,
+  infer,
+  checkExhaustiveness,
+} from "./typechecker";
 import { elaborate } from "./elaboration";
 import { evaluate, prettyValue, ValueEnv } from "./eval";
 import { prettyGADT, prettyCoreExpr, prettyCoercion } from "./prettyprint";
@@ -37,48 +54,56 @@ function buildExprGADT(): GADTDeclaration {
   const a = tVar("a");
   const paramA: GADTTypeParam = { variable: a, kind: kStar };
 
-  return gadtDeclaration("Expr", [paramA], [
-    {
-      name: "IntLit",
-      existentials: [],
-      constraints: [{ lhs: a, rhs: tCon("Int") }],
-      fields: [tCon("Int")],
-      returnType: tCon("Expr", [tCon("Int")]),
-      returnIndices: [tCon("Int")],
-    },
-    {
-      name: "BoolLit",
-      existentials: [],
-      constraints: [{ lhs: a, rhs: tCon("Bool") }],
-      fields: [tCon("Bool")],
-      returnType: tCon("Expr", [tCon("Bool")]),
-      returnIndices: [tCon("Bool")],
-    },
-    {
-      name: "Add",
-      existentials: [],
-      constraints: [{ lhs: a, rhs: tCon("Int") }],
-      fields: [tCon("Expr", [tCon("Int")]), tCon("Expr", [tCon("Int")])],
-      returnType: tCon("Expr", [tCon("Int")]),
-      returnIndices: [tCon("Int")],
-    },
-    {
-      name: "Eq",
-      existentials: [],
-      constraints: [{ lhs: a, rhs: tCon("Bool") }],
-      fields: [tCon("Expr", [tCon("Int")]), tCon("Expr", [tCon("Int")])],
-      returnType: tCon("Expr", [tCon("Bool")]),
-      returnIndices: [tCon("Bool")],
-    },
-    {
-      name: "If",
-      existentials: [],
-      constraints: [],
-      fields: [tCon("Expr", [tCon("Bool")]), tCon("Expr", [a]), tCon("Expr", [a])],
-      returnType: tCon("Expr", [a]),
-      returnIndices: [a],
-    },
-  ]);
+  return gadtDeclaration(
+    "Expr",
+    [paramA],
+    [
+      {
+        name: "IntLit",
+        existentials: [],
+        constraints: [{ lhs: a, rhs: tCon("Int") }],
+        fields: [tCon("Int")],
+        returnType: tCon("Expr", [tCon("Int")]),
+        returnIndices: [tCon("Int")],
+      },
+      {
+        name: "BoolLit",
+        existentials: [],
+        constraints: [{ lhs: a, rhs: tCon("Bool") }],
+        fields: [tCon("Bool")],
+        returnType: tCon("Expr", [tCon("Bool")]),
+        returnIndices: [tCon("Bool")],
+      },
+      {
+        name: "Add",
+        existentials: [],
+        constraints: [{ lhs: a, rhs: tCon("Int") }],
+        fields: [tCon("Expr", [tCon("Int")]), tCon("Expr", [tCon("Int")])],
+        returnType: tCon("Expr", [tCon("Int")]),
+        returnIndices: [tCon("Int")],
+      },
+      {
+        name: "Eq",
+        existentials: [],
+        constraints: [{ lhs: a, rhs: tCon("Bool") }],
+        fields: [tCon("Expr", [tCon("Int")]), tCon("Expr", [tCon("Int")])],
+        returnType: tCon("Expr", [tCon("Bool")]),
+        returnIndices: [tCon("Bool")],
+      },
+      {
+        name: "If",
+        existentials: [],
+        constraints: [],
+        fields: [
+          tCon("Expr", [tCon("Bool")]),
+          tCon("Expr", [a]),
+          tCon("Expr", [a]),
+        ],
+        returnType: tCon("Expr", [a]),
+        returnIndices: [a],
+      },
+    ],
+  );
 }
 
 // ============================================================
@@ -94,24 +119,28 @@ function buildHListGADT(): GADTDeclaration {
   const a = tVar("a_ex");
   const paramN: GADTTypeParam = { variable: n, kind: kStar };
 
-  return gadtDeclaration("HList", [paramN], [
-    {
-      name: "HNil",
-      existentials: [],
-      constraints: [{ lhs: n, rhs: tCon("Zero") }],
-      fields: [],
-      returnType: tCon("HList", [tCon("Zero")]),
-      returnIndices: [tCon("Zero")],
-    },
-    {
-      name: "HCons",
-      existentials: [{ variable: a, kind: kStar }],
-      constraints: [],
-      fields: [a, tCon("HList", [n])],
-      returnType: tCon("HList", [tCon("Succ", [n])]),
-      returnIndices: [tCon("Succ", [n])],
-    },
-  ]);
+  return gadtDeclaration(
+    "HList",
+    [paramN],
+    [
+      {
+        name: "HNil",
+        existentials: [],
+        constraints: [{ lhs: n, rhs: tCon("Zero") }],
+        fields: [],
+        returnType: tCon("HList", [tCon("Zero")]),
+        returnIndices: [tCon("Zero")],
+      },
+      {
+        name: "HCons",
+        existentials: [{ variable: a, kind: kStar }],
+        constraints: [],
+        fields: [a, tCon("HList", [n])],
+        returnType: tCon("HList", [tCon("Succ", [n])]),
+        returnIndices: [tCon("Succ", [n])],
+      },
+    ],
+  );
 }
 
 // ============================================================
@@ -125,19 +154,23 @@ function buildEqualGADT(): GADTDeclaration {
   const a = tVar("a");
   const b = tVar("b");
 
-  return gadtDeclaration("Equal", [
-    { variable: a, kind: kStar },
-    { variable: b, kind: kStar },
-  ], [
-    {
-      name: "Refl",
-      existentials: [],
-      constraints: [{ lhs: a, rhs: b }],
-      fields: [],
-      returnType: tCon("Equal", [a, a]),
-      returnIndices: [a, a],
-    },
-  ]);
+  return gadtDeclaration(
+    "Equal",
+    [
+      { variable: a, kind: kStar },
+      { variable: b, kind: kStar },
+    ],
+    [
+      {
+        name: "Refl",
+        existentials: [],
+        constraints: [{ lhs: a, rhs: b }],
+        fields: [],
+        returnType: tCon("Equal", [a, a]),
+        returnIndices: [a, a],
+      },
+    ],
+  );
 }
 
 // ============================================================
@@ -225,7 +258,9 @@ function demo() {
   };
 
   const ty2 = infer(env, expr2);
-  console.log(`If (BoolLit true) (IntLit 42) (IntLit 0) : ${prettyType(zonk(ty2))}`);
+  console.log(
+    `If (BoolLit true) (IntLit 42) (IntLit 0) : ${prettyType(zonk(ty2))}`,
+  );
 
   // Build: Eq (IntLit 1) (IntLit 2) : Expr Bool
   const expr3: Expr = {
@@ -293,15 +328,22 @@ function demo() {
 
   const matchTy = infer(env, matchExpr);
   console.log(`Pattern match result type: ${prettyType(zonk(matchTy))}`);
-  console.log("  → In IntLit branch: n has type Int (GADT refinement: a ~ Int)");
-  console.log("  → In Add branch: l has type Expr<Int> (GADT refinement: a ~ Int)");
+  console.log(
+    "  → In IntLit branch: n has type Int (GADT refinement: a ~ Int)",
+  );
+  console.log(
+    "  → In Add branch: l has type Expr<Int> (GADT refinement: a ~ Int)",
+  );
   console.log();
 
   // --- Demo 3: Elaborate to Core IR ---
   console.log("━━━ Demo 3: Elaboration to Core IR ━━━\n");
 
   resetIdCounter();
-  const env2 = registerGADT(registerGADT(registerGADT(emptyEnv(), exprGADT), hlistGADT), equalGADT);
+  const env2 = registerGADT(
+    registerGADT(registerGADT(emptyEnv(), exprGADT), hlistGADT),
+    equalGADT,
+  );
 
   // Simple: IntLit 42
   const simpleConstruct: Expr = {
@@ -326,7 +368,10 @@ function demo() {
 
   // More complex: match (IntLit 42) { IntLit n -> n }
   resetIdCounter();
-  const env3 = registerGADT(registerGADT(registerGADT(emptyEnv(), buildExprGADT()), buildHListGADT()), buildEqualGADT());
+  const env3 = registerGADT(
+    registerGADT(registerGADT(emptyEnv(), buildExprGADT()), buildHListGADT()),
+    buildEqualGADT(),
+  );
 
   const matchExpr2: Expr = {
     tag: "EMatch",
@@ -389,7 +434,9 @@ function demo() {
   const scrutineeTy = tCon("Expr", [tMeta()]); // Expr a for some a
   const exhaust = checkExhaustiveness(env4, scrutineeTy, incompleteBranches);
   console.log(`Exhaustive: ${exhaust.isExhaustive}`);
-  console.log(`Missing constructors: [${exhaust.missingConstructors.join(", ")}]`);
+  console.log(
+    `Missing constructors: [${exhaust.missingConstructors.join(", ")}]`,
+  );
   console.log(`Redundant branches: [${exhaust.redundantBranches.join(", ")}]`);
   console.log();
 
@@ -466,10 +513,14 @@ function demo() {
   console.log("  • Type equality constraints (a ~ b)");
   console.log("  • Pattern matching with local type refinement");
   console.log("  • Unification-based type inference with occurs check");
-  console.log("  • Elaboration to System FC-style Core with explicit coercions");
+  console.log(
+    "  • Elaboration to System FC-style Core with explicit coercions",
+  );
   console.log("  • Exhaustiveness & redundancy checking for GADT patterns");
   console.log("  • Runtime evaluation with coercion erasure");
-  console.log("  • Support for type equality witnesses (Leibniz/propositional equality)");
+  console.log(
+    "  • Support for type equality witnesses (Leibniz/propositional equality)",
+  );
 }
 
 demo();

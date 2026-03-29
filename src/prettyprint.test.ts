@@ -23,24 +23,28 @@ function buildExprGADT(): GADTDeclaration {
   const a = tVar("a");
   const paramA: GADTTypeParam = { variable: a, kind: kStar };
 
-  return gadtDeclaration("Expr", [paramA], [
-    {
-      name: "IntLit",
-      existentials: [],
-      constraints: [{ lhs: a, rhs: tCon("Int") }],
-      fields: [tCon("Int")],
-      returnType: tCon("Expr", [tCon("Int")]),
-      returnIndices: [tCon("Int")],
-    },
-    {
-      name: "Add",
-      existentials: [],
-      constraints: [{ lhs: a, rhs: tCon("Int") }],
-      fields: [tCon("Expr", [tCon("Int")]), tCon("Expr", [tCon("Int")])],
-      returnType: tCon("Expr", [tCon("Int")]),
-      returnIndices: [tCon("Int")],
-    },
-  ]);
+  return gadtDeclaration(
+    "Expr",
+    [paramA],
+    [
+      {
+        name: "IntLit",
+        existentials: [],
+        constraints: [{ lhs: a, rhs: tCon("Int") }],
+        fields: [tCon("Int")],
+        returnType: tCon("Expr", [tCon("Int")]),
+        returnIndices: [tCon("Int")],
+      },
+      {
+        name: "Add",
+        existentials: [],
+        constraints: [{ lhs: a, rhs: tCon("Int") }],
+        fields: [tCon("Expr", [tCon("Int")]), tCon("Expr", [tCon("Int")])],
+        returnType: tCon("Expr", [tCon("Int")]),
+        returnIndices: [tCon("Int")],
+      },
+    ],
+  );
 }
 
 /**
@@ -52,16 +56,20 @@ function buildBoxGADT(): GADTDeclaration {
   const a = tVar("a");
   const b = tVar("b");
 
-  return gadtDeclaration("Box", [{ variable: a, kind: kStar }], [
-    {
-      name: "Pack",
-      existentials: [{ variable: b, kind: kStar }],
-      constraints: [],
-      fields: [b],
-      returnType: tCon("Box", [a]),
-      returnIndices: [a],
-    },
-  ]);
+  return gadtDeclaration(
+    "Box",
+    [{ variable: a, kind: kStar }],
+    [
+      {
+        name: "Pack",
+        existentials: [{ variable: b, kind: kStar }],
+        constraints: [],
+        fields: [b],
+        returnType: tCon("Box", [a]),
+        returnIndices: [a],
+      },
+    ],
+  );
 }
 
 test("prettyKind renders nested kind arrows", () => {
@@ -89,13 +97,23 @@ test("prettyCoreExpr prints CoreCase alternatives with existentials, coercions, 
   const a = tVar("a");
   const rendered = prettyCoreExpr({
     tag: "CoreCase",
-    scrutinee: { tag: "CoreVar", name: "expr", type: tCon("Expr", [tCon("Int")]) },
+    scrutinee: {
+      tag: "CoreVar",
+      name: "expr",
+      type: tCon("Expr", [tCon("Int")]),
+    },
     scrutineeType: tCon("Expr", [tCon("Int")]),
     alternatives: [
       {
         constructor: "Pack",
         existentials: [{ var: a, kind: kStar }],
-        coercions: [coAxiom("pack_eq", tCon("Expr", [tCon("Int")]), tCon("Expr", [tCon("Int")]))],
+        coercions: [
+          coAxiom(
+            "pack_eq",
+            tCon("Expr", [tCon("Int")]),
+            tCon("Expr", [tCon("Int")]),
+          ),
+        ],
         bindings: [{ name: "payload", type: tCon("Int") }],
         body: { tag: "CoreVar", name: "payload", type: tCon("Int") },
       },
@@ -104,7 +122,10 @@ test("prettyCoreExpr prints CoreCase alternatives with existentials, coercions, 
   });
 
   match(rendered, /case expr : Expr<Int> : Expr<Int> of/);
-  match(rendered, /\| Pack ∃a\. \[axiom\(pack_eq: Expr<Int> ~ Expr<Int>\)\]\(payload:Int\) ->/);
+  match(
+    rendered,
+    /\| Pack ∃a\. \[axiom\(pack_eq: Expr<Int> ~ Expr<Int>\)\]\(payload:Int\) ->/,
+  );
   match(rendered, /payload : Int/);
   match(rendered, /: Int$/m);
 });

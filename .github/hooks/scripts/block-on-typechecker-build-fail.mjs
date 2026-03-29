@@ -8,10 +8,7 @@ const EDIT_TOOLS = new Set([
   "vscode_renameFile",
 ]);
 
-const GUARDED_FILES = new Set([
-  "src/typechecker.ts",
-  "src/unification.ts",
-]);
+const GUARDED_FILES = new Set(["src/typechecker.ts", "src/unification.ts"]);
 
 function readStdin() {
   return new Promise((resolve) => {
@@ -74,7 +71,9 @@ function summarize(text) {
 async function main() {
   const raw = await readStdin();
   if (!raw.trim()) {
-    process.stdout.write(continueResponse("No hook payload; skipping guarded build check."));
+    process.stdout.write(
+      continueResponse("No hook payload; skipping guarded build check."),
+    );
     return;
   }
 
@@ -82,18 +81,30 @@ async function main() {
   try {
     payload = JSON.parse(raw);
   } catch {
-    process.stdout.write(continueResponse("Invalid hook payload JSON; skipping guarded build check."));
+    process.stdout.write(
+      continueResponse(
+        "Invalid hook payload JSON; skipping guarded build check.",
+      ),
+    );
     return;
   }
 
   const toolName = getToolName(payload);
   if (!EDIT_TOOLS.has(toolName)) {
-    process.stdout.write(continueResponse("Tool is not an edit action; skipping guarded build check."));
+    process.stdout.write(
+      continueResponse(
+        "Tool is not an edit action; skipping guarded build check.",
+      ),
+    );
     return;
   }
 
   if (!touchesGuardedFile(payload)) {
-    process.stdout.write(continueResponse("No guarded file changed; skipping guarded build check."));
+    process.stdout.write(
+      continueResponse(
+        "No guarded file changed; skipping guarded build check.",
+      ),
+    );
     return;
   }
 
@@ -102,7 +113,11 @@ async function main() {
     if (output?.trim()) {
       process.stderr.write(`${output.trim()}\n`);
     }
-    process.stdout.write(continueResponse("Guarded build check passed after typechecker/unification edit."));
+    process.stdout.write(
+      continueResponse(
+        "Guarded build check passed after typechecker/unification edit.",
+      ),
+    );
   } catch (error) {
     const stdout = error?.stdout?.toString?.() ?? "";
     const stderr = error?.stderr?.toString?.() ?? "";
@@ -110,7 +125,11 @@ async function main() {
     if (details) {
       process.stderr.write(`${details}\n`);
     }
-    process.stdout.write(blockResponse("Build failed after edit to guarded typechecker/unification file."));
+    process.stdout.write(
+      blockResponse(
+        "Build failed after edit to guarded typechecker/unification file.",
+      ),
+    );
     process.exitCode = 2;
   }
 }

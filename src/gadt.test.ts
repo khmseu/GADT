@@ -52,29 +52,35 @@ test("gadtDeclaration propagates parent universals to every constructor", () => 
   const a = tVar("a");
   const paramA: GADTTypeParam = { variable: a, kind: kStar };
 
-  const decl = gadtDeclaration("Expr", [paramA], [
-    {
-      name: "IntLit",
-      existentials: [],
-      constraints: [{ lhs: a, rhs: tCon("Int") }],
-      fields: [tCon("Int")],
-      returnType: tCon("Expr", [tCon("Int")]),
-      returnIndices: [tCon("Int")],
-    },
-    {
-      name: "BoolLit",
-      existentials: [],
-      constraints: [{ lhs: a, rhs: tCon("Bool") }],
-      fields: [tCon("Bool")],
-      returnType: tCon("Expr", [tCon("Bool")]),
-      returnIndices: [tCon("Bool")],
-    },
-  ]);
+  const decl = gadtDeclaration(
+    "Expr",
+    [paramA],
+    [
+      {
+        name: "IntLit",
+        existentials: [],
+        constraints: [{ lhs: a, rhs: tCon("Int") }],
+        fields: [tCon("Int")],
+        returnType: tCon("Expr", [tCon("Int")]),
+        returnIndices: [tCon("Int")],
+      },
+      {
+        name: "BoolLit",
+        existentials: [],
+        constraints: [{ lhs: a, rhs: tCon("Bool") }],
+        fields: [tCon("Bool")],
+        returnType: tCon("Expr", [tCon("Bool")]),
+        returnIndices: [tCon("Bool")],
+      },
+    ],
+  );
 
   equal(decl.constructors.length, 2);
   deepStrictEqual(
-    decl.constructors.map((ctor) => ctor.universals.map((u) => u.variable.name)),
-    [["a"], ["a"]]
+    decl.constructors.map((ctor) =>
+      ctor.universals.map((u) => u.variable.name),
+    ),
+    [["a"], ["a"]],
   );
 });
 
@@ -136,7 +142,7 @@ test("gadtDeclaration synthesizes result kind from type parameters", () => {
         returnType: tCon("Pair", [a, b]),
         returnIndices: [a, b],
       },
-    ]
+    ],
   );
 
   deepStrictEqual(decl.kind, kArrow(kStar, kArrow(kStar, kStar)));
@@ -155,10 +161,13 @@ test("instantiateConstructor substitutes fields, return type, and constraints", 
     returnIndices: [a],
   };
 
-  const instantiated = instantiateConstructor(ctor, new Map([
-    [a.id, tCon("Int")],
-    [b.id, tCon("Bool")],
-  ]));
+  const instantiated = instantiateConstructor(
+    ctor,
+    new Map([
+      [a.id, tCon("Int")],
+      [b.id, tCon("Bool")],
+    ]),
+  );
 
   equal(prettyType(instantiated.fields[0]), "Pair<Int, Bool>");
   equal(prettyType(instantiated.returnType), "Box<Int>");

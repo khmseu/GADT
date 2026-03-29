@@ -31,32 +31,40 @@ function buildExprGADT(): GADTDeclaration {
   const a = tVar("a");
   const paramA: GADTTypeParam = { variable: a, kind: kStar };
 
-  return gadtDeclaration("Expr", [paramA], [
-    {
-      name: "IntLit",
-      existentials: [],
-      constraints: [{ lhs: a, rhs: tCon("Int") }],
-      fields: [tCon("Int")],
-      returnType: tCon("Expr", [tCon("Int")]),
-      returnIndices: [tCon("Int")],
-    },
-    {
-      name: "BoolLit",
-      existentials: [],
-      constraints: [{ lhs: a, rhs: tCon("Bool") }],
-      fields: [tCon("Bool")],
-      returnType: tCon("Expr", [tCon("Bool")]),
-      returnIndices: [tCon("Bool")],
-    },
-    {
-      name: "If",
-      existentials: [],
-      constraints: [],
-      fields: [tCon("Expr", [tCon("Bool")]), tCon("Expr", [a]), tCon("Expr", [a])],
-      returnType: tCon("Expr", [a]),
-      returnIndices: [a],
-    },
-  ]);
+  return gadtDeclaration(
+    "Expr",
+    [paramA],
+    [
+      {
+        name: "IntLit",
+        existentials: [],
+        constraints: [{ lhs: a, rhs: tCon("Int") }],
+        fields: [tCon("Int")],
+        returnType: tCon("Expr", [tCon("Int")]),
+        returnIndices: [tCon("Int")],
+      },
+      {
+        name: "BoolLit",
+        existentials: [],
+        constraints: [{ lhs: a, rhs: tCon("Bool") }],
+        fields: [tCon("Bool")],
+        returnType: tCon("Expr", [tCon("Bool")]),
+        returnIndices: [tCon("Bool")],
+      },
+      {
+        name: "If",
+        existentials: [],
+        constraints: [],
+        fields: [
+          tCon("Expr", [tCon("Bool")]),
+          tCon("Expr", [a]),
+          tCon("Expr", [a]),
+        ],
+        returnType: tCon("Expr", [a]),
+        returnIndices: [a],
+      },
+    ],
+  );
 }
 
 /**

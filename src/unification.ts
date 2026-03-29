@@ -7,15 +7,21 @@
 // Deps   : types
 
 import {
-  Type, TypeTag, TypeEquality, TypeVarId, TMeta, TRigid,
-  tMeta, freshId,
+  Type,
+  TypeTag,
+  TypeEquality,
+  TypeVarId,
+  TMeta,
+  TRigid,
+  tMeta,
+  freshId,
 } from "./types";
 
 export class UnificationError extends Error {
   constructor(
     public lhs: Type,
     public rhs: Type,
-    message?: string
+    message?: string,
   ) {
     super(message ?? `Cannot unify ${prettyType(lhs)} with ${prettyType(rhs)}`);
   }
@@ -23,7 +29,11 @@ export class UnificationError extends Error {
 
 export class OccursCheckError extends UnificationError {
   constructor(meta: TMeta, ty: Type) {
-    super(meta, ty, `Occurs check: ${prettyType(meta)} appears in ${prettyType(ty)}`);
+    super(
+      meta,
+      ty,
+      `Occurs check: ${prettyType(meta)} appears in ${prettyType(ty)}`,
+    );
   }
 }
 
@@ -46,7 +56,11 @@ export function zonk(ty: Type): Type {
     case TypeTag.Exists:
       return { ...ty, body: zonk(ty.body) };
     case TypeTag.App:
-      return { ...ty, constructor: zonk(ty.constructor), argument: zonk(ty.argument) };
+      return {
+        ...ty,
+        constructor: zonk(ty.constructor),
+        argument: zonk(ty.argument),
+      };
     case TypeTag.Refined:
       return {
         ...ty,
@@ -112,7 +126,8 @@ export function unify(lhs: Type, rhs: Type): void {
   }
 
   if (l.tag === TypeTag.Var && r.tag === TypeTag.Var && l.id === r.id) return;
-  if (l.tag === TypeTag.Rigid && r.tag === TypeTag.Rigid && l.id === r.id) return;
+  if (l.tag === TypeTag.Rigid && r.tag === TypeTag.Rigid && l.id === r.id)
+    return;
 
   if (l.tag === TypeTag.Constructor && r.tag === TypeTag.Constructor) {
     if (l.id !== r.id) throw new UnificationError(l, r);
@@ -137,7 +152,11 @@ export function unify(lhs: Type, rhs: Type): void {
 
   if (l.tag === TypeTag.Forall && r.tag === TypeTag.Forall) {
     // Alpha-equivalence: instantiate both with same fresh rigid var
-    const rigid: TRigid = { tag: TypeTag.Rigid, id: freshId(), name: l.variable.name };
+    const rigid: TRigid = {
+      tag: TypeTag.Rigid,
+      id: freshId(),
+      name: l.variable.name,
+    };
     const lBody = substituteVar(l.body, l.variable.id, rigid);
     const rBody = substituteVar(r.body, r.variable.id, rigid);
     unify(lBody, rBody);
@@ -152,7 +171,10 @@ function substituteVar(ty: Type, varId: TypeVarId, replacement: Type): Type {
     case TypeTag.Var:
       return ty.id === varId ? replacement : ty;
     case TypeTag.Constructor:
-      return { ...ty, args: ty.args.map((a) => substituteVar(a, varId, replacement)) };
+      return {
+        ...ty,
+        args: ty.args.map((a) => substituteVar(a, varId, replacement)),
+      };
     case TypeTag.Arrow:
       return {
         ...ty,
@@ -287,7 +309,7 @@ export function prettyType(ty: Type): string {
       return `?${t.id}`;
     case TypeTag.Refined:
       const cs = t.constraints.map(
-        (c) => `${prettyType(c.lhs)} ~ ${prettyType(c.rhs)}`
+        (c) => `${prettyType(c.lhs)} ~ ${prettyType(c.rhs)}`,
       );
       return `${prettyType(t.base)} | ${cs.join(", ")}`;
   }

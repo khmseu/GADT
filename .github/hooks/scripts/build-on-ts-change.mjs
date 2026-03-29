@@ -68,7 +68,9 @@ function summarize(text) {
 async function main() {
   const raw = await readStdin();
   if (!raw.trim()) {
-    process.stdout.write(continueResponse("No hook payload; skipping auto-build."));
+    process.stdout.write(
+      continueResponse("No hook payload; skipping auto-build."),
+    );
     return;
   }
 
@@ -76,18 +78,24 @@ async function main() {
   try {
     payload = JSON.parse(raw);
   } catch {
-    process.stdout.write(continueResponse("Invalid hook payload JSON; skipping auto-build."));
+    process.stdout.write(
+      continueResponse("Invalid hook payload JSON; skipping auto-build."),
+    );
     return;
   }
 
   const toolName = getToolName(payload);
   if (!EDIT_TOOLS.has(toolName)) {
-    process.stdout.write(continueResponse("Tool is not an edit action; skipping auto-build."));
+    process.stdout.write(
+      continueResponse("Tool is not an edit action; skipping auto-build."),
+    );
     return;
   }
 
   if (!hasTsSourcePath(payload)) {
-    process.stdout.write(continueResponse("No src/**/*.ts target detected; skipping auto-build."));
+    process.stdout.write(
+      continueResponse("No src/**/*.ts target detected; skipping auto-build."),
+    );
     return;
   }
 
@@ -96,7 +104,9 @@ async function main() {
     if (output?.trim()) {
       process.stderr.write(`${output.trim()}\n`);
     }
-    process.stdout.write(continueResponse("Auto-build succeeded after TypeScript source edit."));
+    process.stdout.write(
+      continueResponse("Auto-build succeeded after TypeScript source edit."),
+    );
   } catch (error) {
     const stdout = error?.stdout?.toString?.() ?? "";
     const stderr = error?.stderr?.toString?.() ?? "";
@@ -104,7 +114,9 @@ async function main() {
     if (details) {
       process.stderr.write(`${details}\n`);
     }
-    process.stdout.write(blockResponse("Auto-build failed after TypeScript source edit."));
+    process.stdout.write(
+      blockResponse("Auto-build failed after TypeScript source edit."),
+    );
     process.exitCode = 2;
   }
 }

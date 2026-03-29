@@ -76,7 +76,9 @@ function normalize(text) {
 async function main() {
   const raw = await readStdin();
   if (!raw.trim()) {
-    process.stdout.write(preToolAllow("No payload; skipping review validation gate."));
+    process.stdout.write(
+      preToolAllow("No payload; skipping review validation gate."),
+    );
     return;
   }
 
@@ -84,13 +86,17 @@ async function main() {
   try {
     payload = JSON.parse(raw);
   } catch {
-    process.stdout.write(preToolAllow("Invalid payload JSON; skipping review validation gate."));
+    process.stdout.write(
+      preToolAllow("Invalid payload JSON; skipping review validation gate."),
+    );
     return;
   }
 
   const toolName = getToolName(payload);
   if (toolName !== "task_complete") {
-    process.stdout.write(preToolAllow("Not a completion step; skipping review validation gate."));
+    process.stdout.write(
+      preToolAllow("Not a completion step; skipping review validation gate."),
+    );
     return;
   }
 
@@ -122,22 +128,28 @@ async function main() {
     "not run",
   ];
 
-  const reviewLike = containsAny(summaryText, reviewSignals) || containsAny(allText, reviewSignals);
+  const reviewLike =
+    containsAny(summaryText, reviewSignals) ||
+    containsAny(allText, reviewSignals);
   if (!reviewLike) {
-    process.stdout.write(preToolAllow("Completion is not a review-claim summary; allowing."));
+    process.stdout.write(
+      preToolAllow("Completion is not a review-claim summary; allowing."),
+    );
     return;
   }
 
   const hasValidationEvidence = containsAny(allText, validationSignals);
   if (hasValidationEvidence) {
-    process.stdout.write(preToolAllow("Review completion includes validation evidence; allowing."));
+    process.stdout.write(
+      preToolAllow("Review completion includes validation evidence; allowing."),
+    );
     return;
   }
 
   process.stdout.write(
     preToolDeny(
-      "Blocked: review/audit completion must include validation status (for example npm run build outcome or an explicit 'could not run' note)."
-    )
+      "Blocked: review/audit completion must include validation status (for example npm run build outcome or an explicit 'could not run' note).",
+    ),
   );
   process.exitCode = 2;
 }

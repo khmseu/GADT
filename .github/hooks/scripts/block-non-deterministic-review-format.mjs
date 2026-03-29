@@ -88,7 +88,9 @@ function hasOrderedSections(text, sections) {
 async function main() {
   const raw = await readStdin();
   if (!raw.trim()) {
-    process.stdout.write(preToolAllow("No payload; skipping deterministic-format gate."));
+    process.stdout.write(
+      preToolAllow("No payload; skipping deterministic-format gate."),
+    );
     return;
   }
 
@@ -96,13 +98,19 @@ async function main() {
   try {
     payload = JSON.parse(raw);
   } catch {
-    process.stdout.write(preToolAllow("Invalid payload JSON; skipping deterministic-format gate."));
+    process.stdout.write(
+      preToolAllow("Invalid payload JSON; skipping deterministic-format gate."),
+    );
     return;
   }
 
   const toolName = getToolName(payload);
   if (toolName !== "task_complete") {
-    process.stdout.write(preToolAllow("Not a completion step; skipping deterministic-format gate."));
+    process.stdout.write(
+      preToolAllow(
+        "Not a completion step; skipping deterministic-format gate.",
+      ),
+    );
     return;
   }
 
@@ -118,14 +126,22 @@ async function main() {
     "soundness",
   ];
 
-  const reviewLike = containsAny(summaryText, reviewSignals) || containsAny(allText, reviewSignals);
+  const reviewLike =
+    containsAny(summaryText, reviewSignals) ||
+    containsAny(allText, reviewSignals);
   if (!reviewLike) {
-    process.stdout.write(preToolAllow("Completion is not review-like; allowing."));
+    process.stdout.write(
+      preToolAllow("Completion is not review-like; allowing."),
+    );
     return;
   }
 
   if (!allText.includes("findings")) {
-    process.stdout.write(preToolDeny("Blocked: review completion must include a Findings section."));
+    process.stdout.write(
+      preToolDeny(
+        "Blocked: review completion must include a Findings section.",
+      ),
+    );
     process.exitCode = 2;
     return;
   }
@@ -148,17 +164,22 @@ async function main() {
   ];
 
   const isDeterministic =
-    hasOrderedSections(allText, standardTemplate) || hasOrderedSections(allText, regressionTemplate);
+    hasOrderedSections(allText, standardTemplate) ||
+    hasOrderedSections(allText, regressionTemplate);
 
   if (isDeterministic) {
-    process.stdout.write(preToolAllow("Review completion matches deterministic section order; allowing."));
+    process.stdout.write(
+      preToolAllow(
+        "Review completion matches deterministic section order; allowing.",
+      ),
+    );
     return;
   }
 
   process.stdout.write(
     preToolDeny(
-      "Blocked: review completion must use an exact deterministic section order (standard or regression template)."
-    )
+      "Blocked: review completion must use an exact deterministic section order (standard or regression template).",
+    ),
   );
   process.exitCode = 2;
 }

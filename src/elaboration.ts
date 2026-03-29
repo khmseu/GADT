@@ -7,14 +7,27 @@
 // Deps   : types, gadt, ast, ir, typechecker, unification
 
 import {
-  Type, TypeTag, TypeEquality, TypeVarId,
-  tVar, tCon, tArrow, tMeta, tRigid, kStar, freshId,
+  Type,
+  TypeTag,
+  TypeEquality,
+  TypeVarId,
+  tVar,
+  tCon,
+  tArrow,
+  tMeta,
+  tRigid,
+  kStar,
+  freshId,
 } from "./types";
 import { applySubstitution, GADTConstructor } from "./gadt";
 import { Expr, MatchBranch, Pattern, PConstructor } from "./ast";
 import {
-  CoreExpr, CoreAlt, Coercion,
-  coRefl, coAxiom, coreExprType,
+  CoreExpr,
+  CoreAlt,
+  Coercion,
+  coRefl,
+  coAxiom,
+  coreExprType,
 } from "./ir";
 import { TypeEnv, infer, check } from "./typechecker";
 import { zonk, prettyType, unify } from "./unification";
@@ -26,9 +39,12 @@ import { zonk, prettyType, unify } from "./unification";
 export function elaborate(env: TypeEnv, expr: Expr): CoreExpr {
   switch (expr.tag) {
     case "ELiteral": {
-      const ty = typeof expr.value === "number" ? tCon("Int")
-               : typeof expr.value === "boolean" ? tCon("Bool")
-               : tCon("String");
+      const ty =
+        typeof expr.value === "number"
+          ? tCon("Int")
+          : typeof expr.value === "boolean"
+            ? tCon("Bool")
+            : tCon("String");
       return { tag: "CoreLit", value: expr.value, type: ty };
     }
 
@@ -130,7 +146,10 @@ export function elaborate(env: TypeEnv, expr: Expr): CoreExpr {
 
     case "ETyAbs": {
       const rigid = tRigid(expr.typeVar.name);
-      const bodyEnv = { ...env, rigidsInScope: new Set([...env.rigidsInScope, rigid.id]) };
+      const bodyEnv = {
+        ...env,
+        rigidsInScope: new Set([...env.rigidsInScope, rigid.id]),
+      };
       const coreBody = elaborate(bodyEnv, expr.body);
       const bodyTy = coreExprType(coreBody);
       return {
@@ -138,7 +157,12 @@ export function elaborate(env: TypeEnv, expr: Expr): CoreExpr {
         typeVar: expr.typeVar,
         kind: expr.kind,
         body: coreBody,
-        type: { tag: TypeTag.Forall, variable: expr.typeVar, kind: expr.kind, body: bodyTy },
+        type: {
+          tag: TypeTag.Forall,
+          variable: expr.typeVar,
+          kind: expr.kind,
+          body: bodyTy,
+        },
       };
     }
 
@@ -146,7 +170,10 @@ export function elaborate(env: TypeEnv, expr: Expr): CoreExpr {
       const coreExpr = elaborate(env, expr.expr);
       const exprTy = zonk(coreExprType(coreExpr));
       if (exprTy.tag !== TypeTag.Forall) throw new Error("Expected forall");
-      const resultTy = applySubstitution(exprTy.body, new Map([[exprTy.variable.id, expr.typeArg]]));
+      const resultTy = applySubstitution(
+        exprTy.body,
+        new Map([[exprTy.variable.id, expr.typeArg]]),
+      );
       return {
         tag: "CoreTyApp",
         expr: coreExpr,
@@ -163,7 +190,7 @@ export function elaborate(env: TypeEnv, expr: Expr): CoreExpr {
  */
 function elaborateMatch(
   env: TypeEnv,
-  expr: { scrutinee: Expr; branches: MatchBranch[] }
+  expr: { scrutinee: Expr; branches: MatchBranch[] },
 ): CoreExpr {
   const coreScrutinee = elaborate(env, expr.scrutinee);
   const scrutineeTy = zonk(coreExprType(coreScrutinee));
@@ -189,12 +216,18 @@ function elaborateBranch(
   env: TypeEnv,
   scrutineeTy: Type,
   resultTy: Type,
-  branch: MatchBranch
+  branch: MatchBranch,
 ): CoreAlt {
   const { pattern, body } = branch;
 
   if (pattern.tag === "PConstructor") {
-    return elaborateConstructorBranch(env, scrutineeTy, resultTy, pattern, body);
+    return elaborateConstructorBranch(
+      env,
+      scrutineeTy,
+      resultTy,
+      pattern,
+      body,
+    );
   }
 
   // Wildcard / variable pattern — no refinements
@@ -210,7 +243,8 @@ function elaborateBranch(
     constructor: pattern.tag === "PVar" ? `@var(${pattern.name})` : "@wildcard",
     existentials: [],
     coercions: [],
-    bindings: pattern.tag === "PVar" ? [{ name: pattern.name, type: scrutineeTy }] : [],
+    bindings:
+      pattern.tag === "PVar" ? [{ name: pattern.name, type: scrutineeTy }] : [],
     body: coreBody,
   };
 }
@@ -220,7 +254,7 @@ function elaborateConstructorBranch(
   scrutineeTy: Type,
   resultTy: Type,
   pattern: PConstructor,
-  body: Expr
+  body: Expr,
 ): CoreAlt {
   const info = env.constructors.get(pattern.constructor);
   if (!info) throw new Error(`Unknown ctor: ${pattern.constructor}`);
@@ -233,11 +267,17 @@ function elaborateConstructorBranch(
   }
 
   // Rigid vars for existentials
-  const existentialBindings: Array<{ var: typeof tVar extends (...a: any) => infer R ? R : never; kind: typeof kStar }> = [];
+  const existentialBindings: Array<{
+    var: typeof tVar extends (...a: any) => infer R ? R : never;
+    kind: typeof kStar;
+  }> = [];
   for (const ex of ctor.existentials) {
     const rigid = tRigid(ex.variable.name);
     typeArgMap.set(ex.variable.id, rigid);
-    existentialBindings.push({ var: tVar(ex.variable.name, rigid.id), kind: ex.kind });
+    existentialBindings.push({
+      var: tVar(ex.variable.name, rigid.id),
+      kind: ex.kind,
+    });
   }
 
   // Instantiate
@@ -251,29 +291,35 @@ function elaborateConstructorBranch(
   const coercions: Coercion[] = [];
   const scrutineeIndices = extractTypeIndices(scrutineeTy);
   const returnIndices = extractTypeIndices(returnType);
-  for (let i = 0; i < Math.min(scrutineeIndices.length, returnIndices.length); i++) {
+  for (
+    let i = 0;
+    i < Math.min(scrutineeIndices.length, returnIndices.length);
+    i++
+  ) {
     const lhs = zonk(scrutineeIndices[i]);
     const rhs = zonk(returnIndices[i]);
-    coercions.push(coAxiom(
-      `${pattern.constructor}_co_${i}`,
-      lhs,
-      rhs
-    ));
+    coercions.push(coAxiom(`${pattern.constructor}_co_${i}`, lhs, rhs));
   }
   // Add ctor constraints as coercions
   for (let i = 0; i < ctor.constraints.length; i++) {
     const c = ctor.constraints[i];
-    coercions.push(coAxiom(
-      `${pattern.constructor}_constraint_${i}`,
-      applySubstitution(c.lhs, typeArgMap),
-      applySubstitution(c.rhs, typeArgMap),
-    ));
+    coercions.push(
+      coAxiom(
+        `${pattern.constructor}_constraint_${i}`,
+        applySubstitution(c.lhs, typeArgMap),
+        applySubstitution(c.rhs, typeArgMap),
+      ),
+    );
   }
 
   // Build bindings from sub-patterns
   const bindings: Array<{ name: string; type: Type }> = [];
   let branchEnv = env;
-  for (let i = 0; i < pattern.subPatterns.length && i < fieldTypes.length; i++) {
+  for (
+    let i = 0;
+    i < pattern.subPatterns.length && i < fieldTypes.length;
+    i++
+  ) {
     const sub = pattern.subPatterns[i];
     const fieldTy = zonk(fieldTypes[i]);
     if (sub.tag === "PVar") {

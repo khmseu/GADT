@@ -93,17 +93,17 @@ test("PConstructor stores subpatterns and existential placeholders", () => {
     tag: "PConstructor",
     constructor: "Cons",
     existentials: [],
-    subPatterns: [
-      { tag: "PVar", name: "head" },
-      { tag: "PWildcard" },
-    ],
+    subPatterns: [{ tag: "PVar", name: "head" }, { tag: "PWildcard" }],
   };
 
   equal(pat.tag, "PConstructor");
   if (pat.tag !== "PConstructor") throw new Error("unreachable");
   equal(pat.constructor, "Cons");
   equal(pat.subPatterns.length, 2);
-  deepStrictEqual(pat.subPatterns.map((p) => p.tag), ["PVar", "PWildcard"]);
+  deepStrictEqual(
+    pat.subPatterns.map((p) => p.tag),
+    ["PVar", "PWildcard"],
+  );
 });
 
 test("MatchBranch can carry guard and later refinement metadata", () => {

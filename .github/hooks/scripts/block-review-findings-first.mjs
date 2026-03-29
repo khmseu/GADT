@@ -82,7 +82,9 @@ function hasFindingsFirstShape(summaryLower) {
 async function main() {
   const raw = await readStdin();
   if (!raw.trim()) {
-    process.stdout.write(preToolAllow("No payload; skipping findings-first gate."));
+    process.stdout.write(
+      preToolAllow("No payload; skipping findings-first gate."),
+    );
     return;
   }
 
@@ -90,13 +92,17 @@ async function main() {
   try {
     payload = JSON.parse(raw);
   } catch {
-    process.stdout.write(preToolAllow("Invalid payload JSON; skipping findings-first gate."));
+    process.stdout.write(
+      preToolAllow("Invalid payload JSON; skipping findings-first gate."),
+    );
     return;
   }
 
   const toolName = getToolName(payload);
   if (toolName !== "task_complete") {
-    process.stdout.write(preToolAllow("Not a completion step; skipping findings-first gate."));
+    process.stdout.write(
+      preToolAllow("Not a completion step; skipping findings-first gate."),
+    );
     return;
   }
 
@@ -117,21 +123,25 @@ async function main() {
 
   const reviewLike = containsAny(summaryLower || allText, reviewSignals);
   if (!reviewLike) {
-    process.stdout.write(preToolAllow("Completion is not review-like; allowing."));
+    process.stdout.write(
+      preToolAllow("Completion is not review-like; allowing."),
+    );
     return;
   }
 
   if (!hasFindingsFirstShape(summaryLower)) {
     process.stdout.write(
       preToolDeny(
-        "Blocked: review completion must be findings-first. Include a Findings section before any summary."
-      )
+        "Blocked: review completion must be findings-first. Include a Findings section before any summary.",
+      ),
     );
     process.exitCode = 2;
     return;
   }
 
-  process.stdout.write(preToolAllow("Review completion is findings-first; allowing."));
+  process.stdout.write(
+    preToolAllow("Review completion is findings-first; allowing."),
+  );
 }
 
 main();

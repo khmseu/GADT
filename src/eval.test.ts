@@ -18,7 +18,10 @@ import { kStar, tCon, tVar } from "./types";
  * @param value - Evaluated runtime value.
  * @param expected - Expected literal payload.
  */
-function expectLiteral(value: Value, expected: number | boolean | string): void {
+function expectLiteral(
+  value: Value,
+  expected: number | boolean | string,
+): void {
   equal(value.tag, "VLit");
   if (value.tag !== "VLit") {
     throw new Error("Expected literal value");
@@ -210,7 +213,10 @@ test("evaluate rejects unbound runtime variables", () => {
     type: tCon("Int"),
   };
 
-  throws(() => evaluate(new Map(), expr), /Unbound variable at runtime: missing/);
+  throws(
+    () => evaluate(new Map(), expr),
+    /Unbound variable at runtime: missing/,
+  );
 });
 
 test("prettyValue renders nested constructor payloads", () => {

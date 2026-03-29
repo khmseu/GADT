@@ -7,20 +7,35 @@
 // Deps   : types, gadt, ast, unification
 
 import {
-  Type, TypeTag, TypeEquality, TypeVarId, Kind, KindTag,
-  tVar, tCon, tArrow, tMeta, tRigid, tForall, kStar,
-  freshId, TMeta,
+  Type,
+  TypeTag,
+  TypeEquality,
+  TypeVarId,
+  Kind,
+  KindTag,
+  tVar,
+  tCon,
+  tArrow,
+  tMeta,
+  tRigid,
+  tForall,
+  kStar,
+  freshId,
+  TMeta,
 } from "./types";
 import {
-  GADTDeclaration, GADTConstructor, GADTTypeParam,
-  extractRefinements, applySubstitution,
+  GADTDeclaration,
+  GADTConstructor,
+  GADTTypeParam,
+  extractRefinements,
+  applySubstitution,
 } from "./gadt";
+import { Expr, Pattern, MatchBranch, PConstructor } from "./ast";
 import {
-  Expr, Pattern, MatchBranch,
-  PConstructor,
-} from "./ast";
-import {
-  unify, zonk, applyRefinements, prettyType,
+  unify,
+  zonk,
+  applyRefinements,
+  prettyType,
   UnificationError,
 } from "./unification";
 
@@ -152,7 +167,7 @@ export function infer(env: TypeEnv, expr: Expr): Type {
       }
       return applySubstitution(
         zonked.body,
-        new Map([[zonked.variable.id, expr.typeArg]])
+        new Map([[zonked.variable.id, expr.typeArg]]),
       );
     }
   }
@@ -193,7 +208,11 @@ function generalize(env: TypeEnv, ty: Type): Type {
   return result;
 }
 
-function freeMetaVars(ty: Type, acc: TMeta[] = [], seen = new Set<TypeVarId>()): TMeta[] {
+function freeMetaVars(
+  ty: Type,
+  acc: TMeta[] = [],
+  seen = new Set<TypeVarId>(),
+): TMeta[] {
   const t = zonk(ty);
   switch (t.tag) {
     case TypeTag.Meta:
@@ -227,7 +246,7 @@ function freeMetaVars(ty: Type, acc: TMeta[] = [], seen = new Set<TypeVarId>()):
 
 function inferConstruct(
   env: TypeEnv,
-  expr: { constructor: string; typeArgs: Type[]; args: Expr[] }
+  expr: { constructor: string; typeArgs: Type[]; args: Expr[] },
 ): Type {
   const info = env.constructors.get(expr.constructor);
   if (!info) throw new TypeError(`Unknown constructor: ${expr.constructor}`);
@@ -262,7 +281,7 @@ function inferConstruct(
   // Check arguments
   if (expr.args.length !== fieldTypes.length) {
     throw new TypeError(
-      `Constructor ${expr.constructor} expects ${fieldTypes.length} args, got ${expr.args.length}`
+      `Constructor ${expr.constructor} expects ${fieldTypes.length} args, got ${expr.args.length}`,
     );
   }
   for (let i = 0; i < expr.args.length; i++) {
@@ -286,7 +305,7 @@ function inferConstruct(
  */
 function inferMatch(
   env: TypeEnv,
-  expr: { scrutinee: Expr; branches: MatchBranch[] }
+  expr: { scrutinee: Expr; branches: MatchBranch[] },
 ): Type {
   const scrutineeTy = zonk(infer(env, expr.scrutinee));
   const resultTy = tMeta();
@@ -302,7 +321,7 @@ function inferBranch(
   env: TypeEnv,
   scrutineeTy: Type,
   resultTy: TMeta | Type,
-  branch: MatchBranch
+  branch: MatchBranch,
 ): void {
   const { pattern, body, guard } = branch;
 
@@ -341,7 +360,7 @@ function inferBranch(
 function checkPattern(
   env: TypeEnv,
   pattern: Pattern,
-  expected: Type
+  expected: Type,
 ): { bindings: Map<string, Type>; refinements: TypeEquality[] } {
   switch (pattern.tag) {
     case "PWildcard":
@@ -381,11 +400,13 @@ function checkPattern(
 function checkConstructorPattern(
   env: TypeEnv,
   pattern: PConstructor,
-  expected: Type
+  expected: Type,
 ): { bindings: Map<string, Type>; refinements: TypeEquality[] } {
   const info = env.constructors.get(pattern.constructor);
   if (!info) {
-    throw new TypeError(`Unknown constructor in pattern: ${pattern.constructor}`);
+    throw new TypeError(
+      `Unknown constructor in pattern: ${pattern.constructor}`,
+    );
   }
 
   const { gadtName, ctor } = info;
@@ -418,7 +439,11 @@ function checkConstructorPattern(
   const scrutineeIndices = extractIndices(expected);
   const ctorIndices = extractIndices(returnType);
   const refinements: TypeEquality[] = [];
-  for (let i = 0; i < Math.min(scrutineeIndices.length, ctorIndices.length); i++) {
+  for (
+    let i = 0;
+    i < Math.min(scrutineeIndices.length, ctorIndices.length);
+    i++
+  ) {
     refinements.push({ lhs: scrutineeIndices[i], rhs: ctorIndices[i] });
   }
   // Add constructor's own constraints
@@ -433,13 +458,17 @@ function checkConstructorPattern(
   if (pattern.subPatterns.length !== fieldTypes.length) {
     throw new TypeError(
       `Constructor ${pattern.constructor} has ${fieldTypes.length} fields, ` +
-      `but pattern has ${pattern.subPatterns.length} sub-patterns`
+        `but pattern has ${pattern.subPatterns.length} sub-patterns`,
     );
   }
 
   let allBindings = new Map<string, Type>();
   for (let i = 0; i < fieldTypes.length; i++) {
-    const { bindings } = checkPattern(env, pattern.subPatterns[i], fieldTypes[i]);
+    const { bindings } = checkPattern(
+      env,
+      pattern.subPatterns[i],
+      fieldTypes[i],
+    );
     for (const [name, ty] of bindings) {
       allBindings.set(name, ty);
     }
@@ -479,17 +508,25 @@ export interface ExhaustivenessResult {
 export function checkExhaustiveness(
   env: TypeEnv,
   scrutineeTy: Type,
-  branches: MatchBranch[]
+  branches: MatchBranch[],
 ): ExhaustivenessResult {
   const t = zonk(scrutineeTy);
   const gadtName = extractGADTName(t);
   if (!gadtName) {
-    return { isExhaustive: true, missingConstructors: [], redundantBranches: [] };
+    return {
+      isExhaustive: true,
+      missingConstructors: [],
+      redundantBranches: [],
+    };
   }
 
   const decl = env.gadtDecls.get(gadtName);
   if (!decl) {
-    return { isExhaustive: true, missingConstructors: [], redundantBranches: [] };
+    return {
+      isExhaustive: true,
+      missingConstructors: [],
+      redundantBranches: [],
+    };
   }
 
   // Get type indices of scrutinee
@@ -505,7 +542,9 @@ export function checkExhaustiveness(
     for (const ex of ctor.existentials) {
       typeArgMap.set(ex.variable.id, tMeta());
     }
-    const retIndices = ctor.returnIndices.map((idx) => applySubstitution(idx, typeArgMap));
+    const retIndices = ctor.returnIndices.map((idx) =>
+      applySubstitution(idx, typeArgMap),
+    );
 
     // Try unification speculatively
     try {

@@ -76,7 +76,9 @@ function normalize(text) {
 async function main() {
   const raw = await readStdin();
   if (!raw.trim()) {
-    process.stdout.write(preToolAllow("No payload; skipping diagnostics validation gate."));
+    process.stdout.write(
+      preToolAllow("No payload; skipping diagnostics validation gate."),
+    );
     return;
   }
 
@@ -84,13 +86,21 @@ async function main() {
   try {
     payload = JSON.parse(raw);
   } catch {
-    process.stdout.write(preToolAllow("Invalid payload JSON; skipping diagnostics validation gate."));
+    process.stdout.write(
+      preToolAllow(
+        "Invalid payload JSON; skipping diagnostics validation gate.",
+      ),
+    );
     return;
   }
 
   const toolName = getToolName(payload);
   if (toolName !== "task_complete") {
-    process.stdout.write(preToolAllow("Not a completion step; skipping diagnostics validation gate."));
+    process.stdout.write(
+      preToolAllow(
+        "Not a completion step; skipping diagnostics validation gate.",
+      ),
+    );
     return;
   }
 
@@ -107,10 +117,13 @@ async function main() {
   ];
 
   const diagnosticsLike =
-    containsAny(summaryText, diagnosticsSignals) || containsAny(allText, diagnosticsSignals);
+    containsAny(summaryText, diagnosticsSignals) ||
+    containsAny(allText, diagnosticsSignals);
 
   if (!diagnosticsLike) {
-    process.stdout.write(preToolAllow("Completion is not diagnostics-review-like; allowing."));
+    process.stdout.write(
+      preToolAllow("Completion is not diagnostics-review-like; allowing."),
+    );
     return;
   }
 
@@ -137,14 +150,18 @@ async function main() {
   const hasStartEvidence = containsAny(allText, startSignals);
 
   if (hasValidationSection && hasBuildEvidence && hasStartEvidence) {
-    process.stdout.write(preToolAllow("Diagnostics completion includes strict validation evidence; allowing."));
+    process.stdout.write(
+      preToolAllow(
+        "Diagnostics completion includes strict validation evidence; allowing.",
+      ),
+    );
     return;
   }
 
   process.stdout.write(
     preToolDeny(
-      "Blocked: diagnostics-review completion must include strict validation evidence: Validation Status/Command Validation plus both build and start coverage (executed or explicitly not run)."
-    )
+      "Blocked: diagnostics-review completion must include strict validation evidence: Validation Status/Command Validation plus both build and start coverage (executed or explicitly not run).",
+    ),
   );
   process.exitCode = 2;
 }

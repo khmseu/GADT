@@ -77,7 +77,7 @@ test("unify enforces occurs-check for recursive bindings", () => {
       }
       match(error.message, /Occurs check/);
       return true;
-    }
+    },
   );
 });
 

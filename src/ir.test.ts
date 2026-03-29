@@ -10,14 +10,7 @@
 import { beforeEach, test } from "node:test";
 import { equal, match } from "node:assert/strict";
 
-import {
-  coAxiom,
-  coRefl,
-  coSym,
-  coTrans,
-  Coercion,
-  CoreExpr,
-} from "./ir";
+import { coAxiom, coRefl, coSym, coTrans, Coercion, CoreExpr } from "./ir";
 import { prettyCoreExpr, prettyCoercion } from "./prettyprint";
 import { resetIdCounter, tCon, tArrow, tVar, kStar } from "./types";
 
@@ -275,7 +268,11 @@ test("prettyCoreExpr renders CoreLet with binding and body", () => {
 });
 
 test("prettyCoreExpr renders CoreCase with alternatives and result type", () => {
-  const scrutinee: CoreExpr = { tag: "CoreLit", value: true, type: tCon("Bool") };
+  const scrutinee: CoreExpr = {
+    tag: "CoreLit",
+    value: true,
+    type: tCon("Bool"),
+  };
   const trueBranch: CoreExpr = { tag: "CoreLit", value: 1, type: tCon("Int") };
   const falseBranch: CoreExpr = { tag: "CoreLit", value: 0, type: tCon("Int") };
   const expr: CoreExpr = {
@@ -283,8 +280,20 @@ test("prettyCoreExpr renders CoreCase with alternatives and result type", () => 
     scrutinee,
     scrutineeType: tCon("Bool"),
     alternatives: [
-      { constructor: "True", existentials: [], coercions: [], bindings: [], body: trueBranch },
-      { constructor: "False", existentials: [], coercions: [], bindings: [], body: falseBranch },
+      {
+        constructor: "True",
+        existentials: [],
+        coercions: [],
+        bindings: [],
+        body: trueBranch,
+      },
+      {
+        constructor: "False",
+        existentials: [],
+        coercions: [],
+        bindings: [],
+        body: falseBranch,
+      },
     ],
     resultType: tCon("Int"),
   };

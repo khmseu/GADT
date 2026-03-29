@@ -30,24 +30,28 @@ beforeEach(() => {
  * and EConstruct tests have at least one registered constructor.
  */
 function buildBoolGADT(): GADTDeclaration {
-  return gadtDeclaration("Bool", [], [
-    {
-      name: "True",
-      existentials: [],
-      constraints: [],
-      fields: [],
-      returnType: tCon("Bool"),
-      returnIndices: [],
-    },
-    {
-      name: "False",
-      existentials: [],
-      constraints: [],
-      fields: [],
-      returnType: tCon("Bool"),
-      returnIndices: [],
-    },
-  ]);
+  return gadtDeclaration(
+    "Bool",
+    [],
+    [
+      {
+        name: "True",
+        existentials: [],
+        constraints: [],
+        fields: [],
+        returnType: tCon("Bool"),
+        returnIndices: [],
+      },
+      {
+        name: "False",
+        existentials: [],
+        constraints: [],
+        fields: [],
+        returnType: tCon("Bool"),
+        returnIndices: [],
+      },
+    ],
+  );
 }
 
 /**
@@ -60,16 +64,20 @@ function buildPairGADT(): GADTDeclaration {
   const paramA: GADTTypeParam = { variable: a, kind: kStar };
   const paramB: GADTTypeParam = { variable: b, kind: kStar };
 
-  return gadtDeclaration("Pair", [paramA, paramB], [
-    {
-      name: "MkPair",
-      existentials: [],
-      constraints: [],
-      fields: [a, b],
-      returnType: tCon("Pair", [a, b]),
-      returnIndices: [a, b],
-    },
-  ]);
+  return gadtDeclaration(
+    "Pair",
+    [paramA, paramB],
+    [
+      {
+        name: "MkPair",
+        existentials: [],
+        constraints: [],
+        fields: [a, b],
+        returnType: tCon("Pair", [a, b]),
+        returnIndices: [a, b],
+      },
+    ],
+  );
 }
 
 /**
@@ -79,16 +87,20 @@ function buildExprGADT(): GADTDeclaration {
   const a = tVar("a");
   const paramA: GADTTypeParam = { variable: a, kind: kStar };
 
-  return gadtDeclaration("Expr", [paramA], [
-    {
-      name: "IntLit",
-      existentials: [],
-      constraints: [{ lhs: a, rhs: tCon("Int") }],
-      fields: [tCon("Int")],
-      returnType: tCon("Expr", [tCon("Int")]),
-      returnIndices: [tCon("Int")],
-    },
-  ]);
+  return gadtDeclaration(
+    "Expr",
+    [paramA],
+    [
+      {
+        name: "IntLit",
+        existentials: [],
+        constraints: [{ lhs: a, rhs: tCon("Int") }],
+        fields: [tCon("Int")],
+        returnType: tCon("Expr", [tCon("Int")]),
+        returnIndices: [tCon("Int")],
+      },
+    ],
+  );
 }
 
 /**

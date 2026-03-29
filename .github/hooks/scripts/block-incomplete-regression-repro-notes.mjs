@@ -76,7 +76,9 @@ function normalize(text) {
 async function main() {
   const raw = await readStdin();
   if (!raw.trim()) {
-    process.stdout.write(preToolAllow("No payload; skipping reproduction-notes gate."));
+    process.stdout.write(
+      preToolAllow("No payload; skipping reproduction-notes gate."),
+    );
     return;
   }
 
@@ -84,13 +86,17 @@ async function main() {
   try {
     payload = JSON.parse(raw);
   } catch {
-    process.stdout.write(preToolAllow("Invalid payload JSON; skipping reproduction-notes gate."));
+    process.stdout.write(
+      preToolAllow("Invalid payload JSON; skipping reproduction-notes gate."),
+    );
     return;
   }
 
   const toolName = getToolName(payload);
   if (toolName !== "task_complete") {
-    process.stdout.write(preToolAllow("Not a completion step; skipping reproduction-notes gate."));
+    process.stdout.write(
+      preToolAllow("Not a completion step; skipping reproduction-notes gate."),
+    );
     return;
   }
 
@@ -105,9 +111,13 @@ async function main() {
     "pipeline",
   ];
 
-  const regressionLike = containsAny(summaryText, regressionSignals) || containsAny(allText, regressionSignals);
+  const regressionLike =
+    containsAny(summaryText, regressionSignals) ||
+    containsAny(allText, regressionSignals);
   if (!regressionLike) {
-    process.stdout.write(preToolAllow("Completion is not regression-audit-like; allowing."));
+    process.stdout.write(
+      preToolAllow("Completion is not regression-audit-like; allowing."),
+    );
     return;
   }
 
@@ -120,20 +130,26 @@ async function main() {
 
   const hasHighMedium = containsAny(allText, highMediumSignals);
   if (!hasHighMedium) {
-    process.stdout.write(preToolAllow("No high/medium findings signaled; allowing."));
+    process.stdout.write(
+      preToolAllow("No high/medium findings signaled; allowing."),
+    );
     return;
   }
 
   const hasReproductionNotesSection = allText.includes("reproduction notes");
   if (hasReproductionNotesSection) {
-    process.stdout.write(preToolAllow("Reproduction Notes section present for high/medium findings; allowing."));
+    process.stdout.write(
+      preToolAllow(
+        "Reproduction Notes section present for high/medium findings; allowing.",
+      ),
+    );
     return;
   }
 
   process.stdout.write(
     preToolDeny(
-      "Blocked: regression completion with high/medium findings must include a Reproduction Notes section."
-    )
+      "Blocked: regression completion with high/medium findings must include a Reproduction Notes section.",
+    ),
   );
   process.exitCode = 2;
 }

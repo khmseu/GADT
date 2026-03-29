@@ -29,7 +29,7 @@ export type CoreExpr =
   | CoreLet
   | CoreCase
   | CoreConstruct
-  | CoreCast;     // Apply a coercion (type equality evidence)
+  | CoreCast; // Apply a coercion (type equality evidence)
 
 export interface CoreLit {
   tag: "CoreLit";
@@ -136,14 +136,14 @@ export interface CoreCast {
  * Inspired by System FC (GHC's intermediate language).
  */
 export type Coercion =
-  | CoRefl        // τ ~ τ
-  | CoSym         // if c : τ₁ ~ τ₂, then sym c : τ₂ ~ τ₁
-  | CoTrans       // if c₁ : τ₁ ~ τ₂, c₂ : τ₂ ~ τ₃, then trans c₁ c₂ : τ₁ ~ τ₃
-  | CoArrow       // if c₁ : σ₁ ~ σ₂, c₂ : τ₁ ~ τ₂, then arrow c₁ c₂ : (σ₁→τ₁) ~ (σ₂→τ₂)
-  | CoApp         // congruence for type application
-  | CoForall      // under a binder
-  | CoAxiom       // from GADT constructor (given by pattern matching)
-  | CoVar;        // coercion variable (from pattern match branch)
+  | CoRefl // τ ~ τ
+  | CoSym // if c : τ₁ ~ τ₂, then sym c : τ₂ ~ τ₁
+  | CoTrans // if c₁ : τ₁ ~ τ₂, c₂ : τ₂ ~ τ₃, then trans c₁ c₂ : τ₁ ~ τ₃
+  | CoArrow // if c₁ : σ₁ ~ σ₂, c₂ : τ₁ ~ τ₂, then arrow c₁ c₂ : (σ₁→τ₁) ~ (σ₂→τ₂)
+  | CoApp // congruence for type application
+  | CoForall // under a binder
+  | CoAxiom // from GADT constructor (given by pattern matching)
+  | CoVar; // coercion variable (from pattern match branch)
 
 export interface CoRefl {
   tag: "CoRefl";
@@ -221,15 +221,25 @@ export function coAxiom(name: string, lhs: Type, rhs: Type): CoAxiom {
 
 export function coreExprType(expr: CoreExpr): Type {
   switch (expr.tag) {
-    case "CoreLit": return expr.type;
-    case "CoreVar": return expr.type;
-    case "CoreLam": return expr.type;
-    case "CoreApp": return expr.type;
-    case "CoreTyLam": return expr.type;
-    case "CoreTyApp": return expr.type;
-    case "CoreLet": return coreExprType(expr.body);
-    case "CoreCase": return expr.resultType;
-    case "CoreConstruct": return expr.type;
-    case "CoreCast": return expr.type;
+    case "CoreLit":
+      return expr.type;
+    case "CoreVar":
+      return expr.type;
+    case "CoreLam":
+      return expr.type;
+    case "CoreApp":
+      return expr.type;
+    case "CoreTyLam":
+      return expr.type;
+    case "CoreTyApp":
+      return expr.type;
+    case "CoreLet":
+      return coreExprType(expr.body);
+    case "CoreCase":
+      return expr.resultType;
+    case "CoreConstruct":
+      return expr.type;
+    case "CoreCast":
+      return expr.type;
   }
 }

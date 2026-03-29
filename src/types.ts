@@ -26,9 +26,9 @@ export enum TypeTag {
   Forall = "Forall",
   Exists = "Exists",
   App = "App",
-  Rigid = "Rigid",       // Skolem / rigid type variable
-  Meta = "Meta",         // Unification metavariable
-  Refined = "Refined",   // Type with refinement constraint
+  Rigid = "Rigid", // Skolem / rigid type variable
+  Meta = "Meta", // Unification metavariable
+  Refined = "Refined", // Type with refinement constraint
 }
 
 export type Type =
@@ -103,8 +103,8 @@ export interface TRefined {
 // ============================================================
 
 export enum KindTag {
-  Star = "Star",       // *  — the kind of types
-  Arrow = "KArrow",    // k1 -> k2
+  Star = "Star", // *  — the kind of types
+  Arrow = "KArrow", // k1 -> k2
   Constraint = "Constraint",
 }
 

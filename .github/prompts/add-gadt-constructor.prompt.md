@@ -4,9 +4,11 @@ name: "Add GADT Constructor"
 argument-hint: "Constructor spec (GADT name, constructor name, fields, constraints, return indices, and example usage)"
 agent: "GADT Pipeline Specialist"
 ---
+
 Implement a new GADT constructor in this repository using the user-provided constructor specification.
 
 Use the argument text as the source of truth for:
+
 - target GADT
 - constructor name
 - field types
@@ -15,10 +17,12 @@ Use the argument text as the source of truth for:
 - one example expression to build in the demo
 
 Follow project guidance in:
+
 - [Workspace Guidelines](../copilot-instructions.md)
 - [Typechecker Refinement Rules](../instructions/typechecker-refinement.instructions.md)
 
 Update only the files needed by the constructor semantics. Typical touchpoints:
+
 - [src/gadt.ts](../../src/gadt.ts)
 - [src/ast.ts](../../src/ast.ts)
 - [src/types.ts](../../src/types.ts)
@@ -31,6 +35,7 @@ Update only the files needed by the constructor semantics. Typical touchpoints:
 - [src/main.ts](../../src/main.ts)
 
 Execution requirements:
+
 1. Implement the constructor with minimal, cohesive changes.
 2. Preserve existing tagged-union and exhaustive-switch style.
 3. Keep refinement flow explicit via existing `TypeEquality[]` and unification helpers.
@@ -39,6 +44,7 @@ Execution requirements:
 6. Run `npm run start` if behavior changed in demo or runtime pipeline.
 
 Final response format:
+
 1. Constructor implemented summary.
 2. Files changed with one-line rationale each.
 3. Validation commands run and outcomes.

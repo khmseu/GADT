@@ -3,6 +3,7 @@ description: "Use when editing GADT type refinement, pattern matching, unificati
 name: "Typechecker Refinement Rules"
 applyTo: "src/typechecker.ts, src/unification.ts"
 ---
+
 # Typechecker Refinement Guidelines
 
 - Preserve soundness first: introduce refinements only from constructor constraints and explicit equality evidence.

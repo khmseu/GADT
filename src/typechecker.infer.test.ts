@@ -10,13 +10,7 @@ import { beforeEach, test } from "node:test";
 import { equal, throws } from "node:assert/strict";
 
 import { GADTDeclaration, GADTTypeParam, gadtDeclaration } from "./gadt";
-import {
-  check,
-  emptyEnv,
-  infer,
-  registerGADT,
-  TypeEnv,
-} from "./typechecker";
+import { check, emptyEnv, infer, registerGADT, TypeEnv } from "./typechecker";
 import { kStar, resetIdCounter, tCon, tForall, tVar } from "./types";
 import { prettyType } from "./unification";
 
@@ -32,24 +26,28 @@ beforeEach(() => {
  * Build a minimal Bool GADT for use in EIf and EConstruct tests.
  */
 function buildBoolGADT(): GADTDeclaration {
-  return gadtDeclaration("Bool", [], [
-    {
-      name: "True",
-      existentials: [],
-      constraints: [],
-      fields: [],
-      returnType: tCon("Bool"),
-      returnIndices: [],
-    },
-    {
-      name: "False",
-      existentials: [],
-      constraints: [],
-      fields: [],
-      returnType: tCon("Bool"),
-      returnIndices: [],
-    },
-  ]);
+  return gadtDeclaration(
+    "Bool",
+    [],
+    [
+      {
+        name: "True",
+        existentials: [],
+        constraints: [],
+        fields: [],
+        returnType: tCon("Bool"),
+        returnIndices: [],
+      },
+      {
+        name: "False",
+        existentials: [],
+        constraints: [],
+        fields: [],
+        returnType: tCon("Bool"),
+        returnIndices: [],
+      },
+    ],
+  );
 }
 
 function makeEnv(): TypeEnv {
@@ -65,11 +63,17 @@ test("infer ELiteral number returns Int", () => {
 });
 
 test("infer ELiteral boolean returns Bool", () => {
-  equal(prettyType(infer(makeEnv(), { tag: "ELiteral", value: false })), "Bool");
+  equal(
+    prettyType(infer(makeEnv(), { tag: "ELiteral", value: false })),
+    "Bool",
+  );
 });
 
 test("infer ELiteral string returns String", () => {
-  equal(prettyType(infer(makeEnv(), { tag: "ELiteral", value: "hi" })), "String");
+  equal(
+    prettyType(infer(makeEnv(), { tag: "ELiteral", value: "hi" })),
+    "String",
+  );
 });
 
 // ============================================================
@@ -100,7 +104,14 @@ test("infer ELambda with annotated param returns arrow type", () => {
     paramType: tCon("Int"),
     body: { tag: "EVar", name: "x" },
   });
-  equal(prettyType(result), prettyType({ tag: "Arrow", param: tCon("Int"), result: tCon("Int") } as any));
+  equal(
+    prettyType(result),
+    prettyType({
+      tag: "Arrow",
+      param: tCon("Int"),
+      result: tCon("Int"),
+    } as any),
+  );
 });
 
 // ============================================================

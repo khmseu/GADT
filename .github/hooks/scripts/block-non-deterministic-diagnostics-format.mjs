@@ -88,7 +88,9 @@ function hasOrderedSections(text, sections) {
 async function main() {
   const raw = await readStdin();
   if (!raw.trim()) {
-    process.stdout.write(preToolAllow("No payload; skipping diagnostics format gate."));
+    process.stdout.write(
+      preToolAllow("No payload; skipping diagnostics format gate."),
+    );
     return;
   }
 
@@ -96,13 +98,17 @@ async function main() {
   try {
     payload = JSON.parse(raw);
   } catch {
-    process.stdout.write(preToolAllow("Invalid payload JSON; skipping diagnostics format gate."));
+    process.stdout.write(
+      preToolAllow("Invalid payload JSON; skipping diagnostics format gate."),
+    );
     return;
   }
 
   const toolName = getToolName(payload);
   if (toolName !== "task_complete") {
-    process.stdout.write(preToolAllow("Not a completion step; skipping diagnostics format gate."));
+    process.stdout.write(
+      preToolAllow("Not a completion step; skipping diagnostics format gate."),
+    );
     return;
   }
 
@@ -120,10 +126,13 @@ async function main() {
   ];
 
   const diagnosticsLike =
-    containsAny(summaryText, diagnosticsSignals) || containsAny(allText, diagnosticsSignals);
+    containsAny(summaryText, diagnosticsSignals) ||
+    containsAny(allText, diagnosticsSignals);
 
   if (!diagnosticsLike) {
-    process.stdout.write(preToolAllow("Completion is not diagnostics-review-like; allowing."));
+    process.stdout.write(
+      preToolAllow("Completion is not diagnostics-review-like; allowing."),
+    );
     return;
   }
 
@@ -138,15 +147,17 @@ async function main() {
 
   if (hasOrderedSections(allText, requiredSections)) {
     process.stdout.write(
-      preToolAllow("Diagnostics review completion matches exact deterministic section order; allowing.")
+      preToolAllow(
+        "Diagnostics review completion matches exact deterministic section order; allowing.",
+      ),
     );
     return;
   }
 
   process.stdout.write(
     preToolDeny(
-      "Blocked: diagnostics review completion must use exact section heading order: Findings, Open Questions/Assumptions, Secondary Summary, Validation Status, Recommended Fix Direction, Confidence."
-    )
+      "Blocked: diagnostics review completion must use exact section heading order: Findings, Open Questions/Assumptions, Secondary Summary, Validation Status, Recommended Fix Direction, Confidence.",
+    ),
   );
   process.exitCode = 2;
 }

@@ -19,8 +19,8 @@ export type Expr =
   | EConstruct
   | EMatch
   | EIf
-  | ETyAbs      // type abstraction (Λa. e)
-  | ETyApp;     // type application (e @τ)
+  | ETyAbs // type abstraction (Λa. e)
+  | ETyApp; // type application (e @τ)
 
 export interface ELiteral {
   tag: "ELiteral";
@@ -126,11 +126,7 @@ export interface EIf {
 // Patterns
 // ============================================================
 
-export type Pattern =
-  | PWildcard
-  | PVar
-  | PLiteral
-  | PConstructor;
+export type Pattern = PWildcard | PVar | PLiteral | PConstructor;
 
 export interface PWildcard {
   tag: "PWildcard";
