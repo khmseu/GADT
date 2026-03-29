@@ -73,6 +73,25 @@ function buildPairGADT(): GADTDeclaration {
 }
 
 /**
+ * Build a minimal Expr GADT to exercise constructor-match elaboration.
+ */
+function buildExprGADT(): GADTDeclaration {
+  const a = tVar("a");
+  const paramA: GADTTypeParam = { variable: a, kind: kStar };
+
+  return gadtDeclaration("Expr", [paramA], [
+    {
+      name: "IntLit",
+      existentials: [],
+      constraints: [{ lhs: a, rhs: tCon("Int") }],
+      fields: [tCon("Int")],
+      returnType: tCon("Expr", [tCon("Int")]),
+      returnIndices: [tCon("Int")],
+    },
+  ]);
+}
+
+/**
  * Create a test environment with Bool and Pair GADTs registered.
  */
 function makeEnv(): TypeEnv {
@@ -80,6 +99,13 @@ function makeEnv(): TypeEnv {
   env = registerGADT(env, buildBoolGADT());
   env = registerGADT(env, buildPairGADT());
   return env;
+}
+
+/**
+ * Create a test environment with the Expr GADT registered.
+ */
+function makeExprEnv(): TypeEnv {
+  return registerGADT(emptyEnv(), buildExprGADT());
 }
 
 // ============================================================
@@ -202,6 +228,20 @@ test("elaborate let produces CoreLet with correct binding name and body type", (
   equal(prettyType(coreExprType(result)), "Int");
 });
 
+test("elaborate annotation discards wrapper and elaborates inner expression", () => {
+  const env = makeEnv();
+  const result = elaborate(env, {
+    tag: "EAnnot",
+    expr: { tag: "ELiteral", value: 5 },
+    annotation: tCon("Int"),
+  });
+
+  equal(result.tag, "CoreLit");
+  if (result.tag !== "CoreLit") throw new Error("unreachable");
+  equal(result.value, 5);
+  equal(prettyType(result.type), "Int");
+});
+
 // ============================================================
 // If elaboration
 // ============================================================
@@ -246,4 +286,100 @@ test("elaborate EConstruct produces CoreConstruct with GADT return type", () => 
   equal(result.constructor, "MkPair");
   equal(result.args.length, 2);
   match(prettyType(coreExprType(result)), /Pair/);
+});
+
+// ============================================================
+// Type abstraction and application elaboration
+// ============================================================
+
+test("elaborate ETyAbs produces CoreTyLam with forall type", () => {
+  const env = makeEnv();
+  const a = tVar("a");
+  const result = elaborate(env, {
+    tag: "ETyAbs",
+    typeVar: a,
+    kind: kStar,
+    body: { tag: "ELiteral", value: 42 },
+  });
+
+  equal(result.tag, "CoreTyLam");
+  if (result.tag !== "CoreTyLam") throw new Error("unreachable");
+  equal(result.typeVar.name, "a");
+  equal(prettyType(result.type), "(∀a. Int)");
+});
+
+test("elaborate ETyApp instantiates the body type", () => {
+  const env = makeEnv();
+  const a = tVar("a");
+  const result = elaborate(env, {
+    tag: "ETyApp",
+    expr: {
+      tag: "ETyAbs",
+      typeVar: a,
+      kind: kStar,
+      body: { tag: "ELiteral", value: 42 },
+    },
+    typeArg: tCon("Int"),
+  });
+
+  equal(result.tag, "CoreTyApp");
+  if (result.tag !== "CoreTyApp") throw new Error("unreachable");
+  equal(prettyType(result.type), "Int");
+});
+
+// ============================================================
+// Match elaboration
+// ============================================================
+
+test("elaborate variable-pattern match binds scrutinee in CoreCase alternative", () => {
+  const env = makeEnv();
+  const result = elaborate(env, {
+    tag: "EMatch",
+    scrutinee: { tag: "ELiteral", value: 7 },
+    branches: [
+      {
+        pattern: { tag: "PVar", name: "x" },
+        body: { tag: "EVar", name: "x" },
+      },
+    ],
+  });
+
+  equal(result.tag, "CoreCase");
+  if (result.tag !== "CoreCase") throw new Error("unreachable");
+  equal(result.alternatives[0].constructor, "@var(x)");
+  equal(result.alternatives[0].bindings.length, 1);
+  equal(result.alternatives[0].bindings[0].name, "x");
+  equal(prettyType(result.alternatives[0].bindings[0].type), "Int");
+});
+
+test("elaborate constructor-pattern match emits coercions and field bindings", () => {
+  const env = makeExprEnv();
+  const result = elaborate(env, {
+    tag: "EMatch",
+    scrutinee: {
+      tag: "EConstruct",
+      constructor: "IntLit",
+      typeArgs: [],
+      args: [{ tag: "ELiteral", value: 1 }],
+    },
+    branches: [
+      {
+        pattern: {
+          tag: "PConstructor",
+          constructor: "IntLit",
+          existentials: [],
+          subPatterns: [{ tag: "PVar", name: "n" }],
+        },
+        body: { tag: "EVar", name: "n" },
+      },
+    ],
+  });
+
+  equal(result.tag, "CoreCase");
+  if (result.tag !== "CoreCase") throw new Error("unreachable");
+  equal(result.alternatives[0].constructor, "IntLit");
+  equal(result.alternatives[0].bindings.length, 1);
+  equal(result.alternatives[0].bindings[0].name, "n");
+  equal(prettyType(result.alternatives[0].bindings[0].type), "Int");
+  equal(result.alternatives[0].coercions.length, 2);
 });
