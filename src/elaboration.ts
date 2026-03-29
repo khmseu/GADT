@@ -1,6 +1,10 @@
 // ============================================================
 // Elaboration: Surface AST → Core IR with Explicit Coercions
 // ============================================================
+// Stage  : 4b — Translation from surface AST to core IR
+// Input  : Expr from ast; TypeEnv, infer, check from typechecker
+// Output : elaborate (CoreExpr)
+// Deps   : types, gadt, ast, ir, typechecker, unification
 
 import {
   Type, TypeTag, TypeEquality, TypeVarId,

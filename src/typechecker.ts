@@ -1,6 +1,10 @@
 // ============================================================
 // Type Checker with GADT Pattern Matching & Refinement
 // ============================================================
+// Stage  : 3b — Bidirectional inference and GADT refinement
+// Input  : Expr, Pattern from ast; GADTDeclaration from gadt; Type from types
+// Output : TypeEnv, infer, check, registerGADT, checkExhaustiveness
+// Deps   : types, gadt, ast, unification
 
 import {
   Type, TypeTag, TypeEquality, TypeVarId, Kind, KindTag,

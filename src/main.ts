@@ -1,6 +1,10 @@
 // ============================================================
 // Full GADT Compiler Demo
 // ============================================================
+// Stage  : 7 — End-to-end demo wiring
+// Input  : all pipeline stages
+// Output : console output (type-checked & evaluated GADT programs)
+// Deps   : types, gadt, ast, typechecker, elaboration, eval, prettyprint, unification
 
 import {
   Type, TypeTag, TypeVarId, TVar,

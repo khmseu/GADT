@@ -1,6 +1,10 @@
 // ============================================================
 // Pretty Printing for Core IR and Types
 // ============================================================
+// Stage  : 6 — Human-readable output
+// Input  : Type, Kind from types; CoreExpr, Coercion from ir; GADTDeclaration from gadt
+// Output : prettyKind, prettyGADT, prettyCoreExpr, prettyCoercion
+// Deps   : types, ir, gadt, unification
 
 import { Type, TypeTag, Kind, KindTag } from "./types";
 import { CoreExpr, CoreAlt, Coercion, coreExprType } from "./ir";

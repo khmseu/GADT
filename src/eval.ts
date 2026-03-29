@@ -1,6 +1,10 @@
 // ============================================================
 // Interpreter for Core IR (for testing / verification)
 // ============================================================
+// Stage  : 5 — Evaluation
+// Input  : CoreExpr from ir
+// Output : Value, ValueEnv, evaluate, prettyValue
+// Deps   : ir, types
 
 import { CoreExpr, CoreAlt, coreExprType } from "./ir";
 import { Type } from "./types";

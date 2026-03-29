@@ -1,6 +1,10 @@
 // ============================================================
 // Intermediate Representation: Core Language with GADTs
 // ============================================================
+// Stage  : 4a — Core IR definitions
+// Input  : Type, Kind from types; GADTConstructor from gadt
+// Output : CoreExpr, CoreAlt, Coercion, coercion smart-constructors
+// Deps   : types, gadt
 
 import { Type, TypeVarId, TVar, Kind } from "./types";
 import { GADTConstructor } from "./gadt";

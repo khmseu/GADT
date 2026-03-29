@@ -1,6 +1,10 @@
 // ============================================================
 // GADT Definitions — Declarations & Constructors
 // ============================================================
+// Stage  : 2 — GADT declaration model
+// Input  : Type, Kind, TypeEquality from types
+// Output : GADTDeclaration, GADTConstructor, substitution helpers
+// Deps   : types
 
 import {
   Type, Kind, TypeEquality, TypeVarId, TVar,

@@ -1,6 +1,10 @@
 // ============================================================
 // Abstract Syntax Tree — Expressions & Patterns
 // ============================================================
+// Stage  : 1 — Surface syntax
+// Input  : —
+// Output : Expr, Pattern, MatchBranch (surface-language nodes)
+// Deps   : types, gadt
 
 import { Type, TypeVarId, TVar, Kind } from "./types";
 import { GADTConstructor } from "./gadt";

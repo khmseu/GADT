@@ -1,6 +1,10 @@
 // ============================================================
 // Unification Engine with GADT Equality Propagation
 // ============================================================
+// Stage  : 3a — Constraint solving
+// Input  : TMeta, Type, TypeEquality from types
+// Output : unify, zonk, applyRefinements, prettyType
+// Deps   : types
 
 import {
   Type, TypeTag, TypeEquality, TypeVarId, TMeta, TRigid,

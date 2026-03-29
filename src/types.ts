@@ -1,6 +1,10 @@
 // ============================================================
 // Core Type Representations
 // ============================================================
+// Stage  : 0 — Shared type definitions
+// Input  : —
+// Output : Type, Kind, TypeVarId, TMeta, and all type smart-constructors
+// Deps   : none
 
 /** Unique identifier for type variables */
 export type TypeVarId = number;
