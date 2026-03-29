@@ -131,3 +131,60 @@ test("checkExhaustiveness treats non-GADT scrutinee types as trivially exhaustiv
   deepStrictEqual(result.missingConstructors, []);
   deepStrictEqual(result.redundantBranches, []);
 });
+
+test("checkExhaustiveness treats wildcard branch as covering all inhabitable constructors", () => {
+  const env = createExprEnv();
+  const scrutineeTy = tCon("Expr", [tCon("Int")]);
+
+  const result = checkExhaustiveness(env, scrutineeTy, [
+    {
+      pattern: { tag: "PWildcard" },
+      body: { tag: "ELiteral", value: 0 },
+    },
+  ]);
+
+  equal(result.isExhaustive, true);
+  deepStrictEqual(result.missingConstructors, []);
+  deepStrictEqual(result.redundantBranches, []);
+});
+
+test("checkExhaustiveness treats variable pattern as covering all inhabitable constructors", () => {
+  const env = createExprEnv();
+  const scrutineeTy = tCon("Expr", [tCon("Int")]);
+
+  const result = checkExhaustiveness(env, scrutineeTy, [
+    {
+      pattern: { tag: "PVar", name: "expr" },
+      body: { tag: "ELiteral", value: 0 },
+    },
+  ]);
+
+  equal(result.isExhaustive, true);
+  deepStrictEqual(result.missingConstructors, []);
+  deepStrictEqual(result.redundantBranches, []);
+});
+
+test("checkExhaustiveness marks constructor branches after wildcard as redundant", () => {
+  const env = createExprEnv();
+  const scrutineeTy = tCon("Expr", [tCon("Int")]);
+
+  const result = checkExhaustiveness(env, scrutineeTy, [
+    {
+      pattern: { tag: "PWildcard" },
+      body: { tag: "ELiteral", value: 0 },
+    },
+    {
+      pattern: {
+        tag: "PConstructor",
+        constructor: "IntLit",
+        existentials: [],
+        subPatterns: [{ tag: "PWildcard" }],
+      },
+      body: { tag: "ELiteral", value: 1 },
+    },
+  ]);
+
+  equal(result.isExhaustive, true);
+  deepStrictEqual(result.missingConstructors, []);
+  deepStrictEqual(result.redundantBranches, [1]);
+});
